@@ -9,101 +9,75 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: #333;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Header styles */
-.header {
-    text-align: center;
-    padding: 40px 0;
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    color: white;
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 40px;
-}
-
-.logo h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.tagline {
-    font-size: 1rem;
-    color: #94a3b8;
-    font-weight: 400;
-}
-
-.header-content h2 {
-    font-size: 2rem;
-    margin: 20px 0 10px;
-    font-weight: 600;
-}
-
-.header-content p {
-    font-size: 1.1rem;
-    color: #cbd5e1;
-    max-width: 600px;
-    margin: 0 auto;
+    background: #f8fafc;
 }
 
 /* Calculator container */
 .calculator-container {
-    margin-bottom: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8fafc;
+}
+
+.calculator-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.calculator-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.calculator-header p {
+    font-size: 1rem;
+    color: #64748b;
 }
 
 .calculator-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    gap: 30px;
     align-items: start;
 }
 
 /* Input section */
 .input-section {
     background: white;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
 }
 
 .input-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 25px;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
     color: #1e293b;
     font-weight: 600;
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 500;
     color: #475569;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .input-group input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 10px 12px;
     border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
     background: #f8fafc;
 }
@@ -117,21 +91,21 @@ body {
 
 .calculate-btn {
     width: 100%;
-    padding: 16px;
+    padding: 12px;
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
+    border-radius: 8px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .calculate-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
 }
 
 .calculate-btn:active {
@@ -141,15 +115,15 @@ body {
 /* Results section */
 .results-section {
     background: white;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
 }
 
 .results-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 25px;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
     color: #1e293b;
     font-weight: 600;
 }
@@ -157,22 +131,22 @@ body {
 .savings-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .savings-card {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    padding: 20px;
-    border-radius: 12px;
+    padding: 16px;
+    border-radius: 8px;
     text-align: center;
     border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
 }
 
 .savings-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .savings-card.total {
@@ -182,20 +156,20 @@ body {
 }
 
 .savings-icon {
-    font-size: 2rem;
-    margin-bottom: 10px;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
 }
 
 .savings-card h4 {
-    font-size: 1rem;
-    margin-bottom: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
     font-weight: 600;
 }
 
 .savings-amount {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #059669;
 }
 
@@ -204,9 +178,9 @@ body {
 }
 
 .savings-description {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #64748b;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .savings-card.total .savings-description {
@@ -216,14 +190,14 @@ body {
 /* Breakdown section */
 .breakdown-section {
     background: #f8fafc;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
 .breakdown-section h4 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
+    font-size: 1rem;
+    margin-bottom: 12px;
     color: #1e293b;
     font-weight: 600;
 }
@@ -232,9 +206,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 6px 0;
     border-bottom: 1px solid #e2e8f0;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .breakdown-item:last-child {
@@ -243,49 +217,44 @@ body {
 
 .breakdown-item.total-row {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #059669;
     border-top: 2px solid #e2e8f0;
-    padding-top: 12px;
-    margin-top: 8px;
+    padding-top: 10px;
+    margin-top: 6px;
 }
 
 /* CTA section */
 .cta-section {
     text-align: center;
-    padding: 25px;
+    padding: 20px;
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    border-radius: 12px;
+    border-radius: 8px;
     color: white;
 }
 
 .cta-section h4 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
     font-weight: 600;
-}
-
-.cta-section p {
-    margin-bottom: 20px;
-    color: #cbd5e1;
 }
 
 .cta-buttons {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .btn-primary, .btn-secondary {
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .btn-primary {
@@ -300,80 +269,19 @@ body {
 }
 
 .btn-primary:hover, .btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Benefits section */
-.benefits-section {
-    margin-bottom: 60px;
-}
-
-.benefits-section h3 {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 40px;
-    color: #1e293b;
-    font-weight: 600;
-}
-
-.benefits-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-}
-
-.benefit-card {
-    background: white;
-    padding: 30px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.benefit-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-}
-
-.benefit-icon {
-    font-size: 3rem;
-    margin-bottom: 20px;
-}
-
-.benefit-card h4 {
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    color: #1e293b;
-    font-weight: 600;
-}
-
-.benefit-card p {
-    color: #64748b;
-    line-height: 1.6;
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 30px 0;
-    background: #1e293b;
-    color: #94a3b8;
-    border-radius: 20px 20px 0 0;
-}
-
-.footer p {
-    margin-bottom: 5px;
-    font-size: 0.9rem;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive design */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
+    .calculator-container {
+        padding: 15px;
+    }
+    
     .calculator-grid {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: 20px;
     }
     
     .savings-grid {
@@ -383,31 +291,9 @@ body {
     .savings-card.total {
         grid-column: span 1;
     }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 0 15px;
-    }
-    
-    .header {
-        padding: 30px 0;
-    }
-    
-    .logo h1 {
-        font-size: 2rem;
-    }
-    
-    .header-content h2 {
-        font-size: 1.5rem;
-    }
     
     .input-section, .results-section {
         padding: 20px;
-    }
-    
-    .benefits-grid {
-        grid-template-columns: 1fr;
     }
     
     .cta-buttons {
@@ -417,20 +303,16 @@ body {
     
     .btn-primary, .btn-secondary {
         width: 100%;
-        max-width: 250px;
+        max-width: 200px;
     }
 }
 
 @media (max-width: 480px) {
     .savings-amount {
+        font-size: 1.2rem;
+    }
+    
+    .calculator-header h2 {
         font-size: 1.5rem;
-    }
-    
-    .benefit-card {
-        padding: 20px;
-    }
-    
-    .benefit-icon {
-        font-size: 2.5rem;
     }
 } 

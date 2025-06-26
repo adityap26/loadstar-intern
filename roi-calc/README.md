@@ -1,6 +1,106 @@
 # iVMI ROI Calculator
 
-A comprehensive Return on Investment (ROI) calculator for iVMI's autonomous inventory management solution. This calculator helps businesses understand the cost savings and benefits of implementing iVMI's AI-powered inventory management system compared to traditional manual labor approaches.
+A professional ROI calculator for iVMI's autonomous inventory management solution. Calculate potential savings from labor reduction, shrinkage prevention, and efficiency gains.
+
+## Files Overview
+
+- **`index.html`** - Standalone calculator page with full styling
+- **`embed.html`** - Compact, self-contained version for embedding into existing websites
+- **`calculator.js`** - Core calculator logic and functionality
+- **`styles.css`** - Styling for the standalone version
+
+## Usage Options
+
+### Option 1: Standalone Calculator
+Use `index.html` for a complete, standalone ROI calculator page. This includes:
+- Full header and branding
+- Complete styling
+- All features and animations
+
+### Option 2: Embed into Existing Website
+Use `embed.html` for easy integration into your existing iVMI website. This version:
+- Is self-contained (CSS and JS included)
+- Has a compact design
+- Removes unnecessary branding elements
+- Fits well within existing page layouts
+
+## How to Embed
+
+### Method 1: Direct Embed
+Simply copy the contents of `embed.html` and paste it into your existing webpage where you want the calculator to appear.
+
+### Method 2: Iframe Embed
+```html
+<iframe src="path/to/embed.html" width="100%" height="800px" frameborder="0"></iframe>
+```
+
+### Method 3: Component Integration
+Extract the calculator container from `embed.html` and integrate it into your existing page structure:
+
+```html
+<!-- Copy just the calculator-container div and its contents -->
+<div class="calculator-container">
+    <!-- Calculator content here -->
+</div>
+```
+
+## Calculator Features
+
+### Input Fields
+- **Hourly Wage**: Average hourly rate for inventory workers
+- **Hours per Week**: Weekly hours worked per employee
+- **Number of Workers**: Total employees managing inventory
+- **Annual Shrinkage**: Current annual inventory loss value
+- **Inventory Value**: Total value of inventory
+- **Count Frequency**: How often inventory is counted per month
+
+### Calculated Savings
+- **Labor Savings**: 80% reduction in manual labor costs
+- **Shrinkage Reduction**: 20% reduction in inventory loss
+- **Efficiency Gains**: Time saved from automated counting
+- **Total Annual Savings**: Combined ROI from all sources
+
+### Real-time Updates
+- Calculations update automatically as users type
+- Responsive design works on all devices
+- Smooth animations for better user experience
+
+## Customization
+
+### Styling
+The calculator uses a clean, modern design with:
+- Inter font family
+- Blue gradient primary colors
+- Green accent for savings amounts
+- Responsive grid layout
+
+### Calculations
+The ROI calculations are based on:
+- 80% reduction in manual labor through automation
+- 20% reduction in inventory shrinkage
+- Efficiency gains from time saved on counting
+- Conservative iVMI pricing estimates
+
+### Pricing Model
+- Base cost: $500/month
+- Additional cost: $50/month per worker
+- Annual cost calculated as: (Base + Per Worker × Workers) × 12
+
+## Browser Compatibility
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Mobile responsive design
+- No external dependencies except Google Fonts
+
+## Integration Tips
+
+1. **Customize CTA Buttons**: Update the "Book Demo" and "Contact Sales" buttons to link to your actual contact forms
+2. **Adjust Colors**: Modify the CSS variables to match your brand colors
+3. **Add Analytics**: Track calculator usage with Google Analytics or similar tools
+4. **A/B Testing**: Test different default values to optimize conversion rates
+
+## Support
+
+For questions about integration or customization, contact the development team.
 
 ## Features
 

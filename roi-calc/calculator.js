@@ -190,9 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Make calculator available globally for debugging
     window.ivmiCalculator = calculator;
     
-    // Add some helpful tooltips and validation
+    // Add input validation
     addInputValidation();
-    addHelpfulTooltips();
 });
 
 function addInputValidation() {
@@ -211,36 +210,6 @@ function addInputValidation() {
             }
         });
     });
-}
-
-function addHelpfulTooltips() {
-    // Add helpful information to the page
-    const helpfulInfo = document.createElement('div');
-    helpfulInfo.innerHTML = `
-        <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 0.9rem; color: #0c4a6e;">
-            <strong>💡 Pro Tips:</strong>
-            <ul style="margin: 10px 0 0 20px;">
-                <li>iVMI typically reduces manual labor by 80% through automation</li>
-                <li>Inventory shrinkage is reduced by 20% with real-time monitoring</li>
-                <li>15-minute inventory updates vs. hours of manual counting</li>
-                <li>Break-even period is typically 12 months or less</li>
-            </ul>
-        </div>
-    `;
-    
-    const calculatorContainer = document.querySelector('.calculator-container');
-    calculatorContainer.insertBefore(helpfulInfo, calculatorContainer.firstChild);
-}
-
-// Additional utility functions for advanced calculations
-function calculateScenarioComparison() {
-    const scenarios = {
-        small: { workers: 1, inventory: 100000, shrinkage: 10000 },
-        medium: { workers: 3, inventory: 500000, shrinkage: 50000 },
-        large: { workers: 8, inventory: 2000000, shrinkage: 200000 }
-    };
-    
-    return scenarios;
 }
 
 // Export functions for potential integration
