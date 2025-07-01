@@ -1,124 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iVMI ROI Calculator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockVUE ROI Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="calculator-container">
-        <div class="calculator-header">
-            <h2>ROI Calculator</h2>
-            <p>See how much you can save with iVMI</p>
-        </div>
-
-        <div class="calculator-grid">
-            <div class="input-section">
-                <h3>Your Current Costs</h3>
-                
-                <div class="input-group">
-                    <label for="hourlyWage">Hourly Wage ($)</label>
-                    <input type="number" id="hourlyWage" value="25" min="10" max="100" step="0.50">
-                </div>
-
-                <div class="input-group">
-                    <label for="hoursPerWeek">Hours per Week</label>
-                    <input type="number" id="hoursPerWeek" value="40" min="10" max="80" step="5">
-                </div>
-
-                <div class="input-group">
-                    <label for="workersCount">Number of Workers</label>
-                    <input type="number" id="workersCount" value="2" min="1" max="20" step="1">
-                </div>
-
-                <div class="input-group">
-                    <label for="annualShrinkage">Annual Shrinkage ($)</label>
-                    <input type="number" id="annualShrinkage" value="50000" min="1000" max="1000000" step="1000">
-                </div>
-
-                <div class="input-group">
-                    <label for="inventoryValue">Inventory Value ($)</label>
-                    <input type="number" id="inventoryValue" value="500000" min="10000" max="10000000" step="10000">
-                </div>
-
-                <div class="input-group">
-                    <label for="countFrequency">Count Frequency (per month)</label>
-                    <input type="number" id="countFrequency" value="4" min="1" max="30" step="1">
-                </div>
-
-                <button id="calculateBtn" class="calculate-btn">Calculate Savings</button>
-            </div>
-
-            <div class="results-section">
-                <h3>Your Annual Savings</h3>
-                
-                <div class="savings-grid">
-                    <div class="savings-card">
-                        <div class="savings-icon">💰</div>
-                        <h4>Labor Savings</h4>
-                        <div class="savings-amount" id="laborSavings">$0</div>
-                        <p class="savings-description">80% reduction</p>
-                    </div>
-
-                    <div class="savings-card">
-                        <div class="savings-icon">📦</div>
-                        <h4>Shrinkage Reduction</h4>
-                        <div class="savings-amount" id="shrinkageSavings">$0</div>
-                        <p class="savings-description">20% less loss</p>
-                    </div>
-
-                    <div class="savings-card">
-                        <div class="savings-icon">⚡</div>
-                        <h4>Efficiency Gains</h4>
-                        <div class="savings-amount" id="efficiencySavings">$0</div>
-                        <p class="savings-description">Time saved</p>
-                    </div>
-
-                    <div class="savings-card total">
-                        <div class="savings-icon">🎯</div>
-                        <h4>Total Savings</h4>
-                        <div class="savings-amount" id="totalSavings">$0</div>
-                        <p class="savings-description">Your ROI</p>
-                    </div>
-                </div>
-
-                <div class="breakdown-section">
-                    <h4>Breakdown</h4>
-                    <div class="breakdown-item">
-                        <span>Current Labor Cost:</span>
-                        <span id="currentLaborCost">$0</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>iVMI Cost:</span>
-                        <span id="ivmiCost">$0</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Net Labor Savings:</span>
-                        <span id="netLaborSavings">$0</span>
-                    </div>
-                    <div class="breakdown-item">
-                        <span>Shrinkage Savings:</span>
-                        <span id="shrinkageBreakdown">$0</span>
-                    </div>
-                    <div class="breakdown-item total-row">
-                        <span>Total Annual Savings:</span>
-                        <span id="totalBreakdown">$0</span>
-                    </div>
-                </div>
-
-                <div class="cta-section">
-                    <h4>Ready to Start Saving?</h4>
-                    <div class="cta-buttons">
-                        <button class="btn-primary">Book Demo</button>
-                        <button class="btn-secondary">Contact Sales</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>StockVUE ROI Calculator</h1>
+      <p>Calculate your return on investment with our comprehensive inventory management solution</p>
     </div>
 
-    <script src="calculator.js"></script>
+    <div class="content">
+      <div class="sections-grid">
+        <section class="section">
+          <h2>Inventory Carrying Cost</h2>
+          <div class="form-group">
+            <label for="inv_count">Number of items in inventory</label>
+            <input type="number" id="inv_count" value="100">
+          </div>
+          <div class="form-group">
+            <label for="cost_per_piece">Average cost per piece</label>
+            <input type="number" id="cost_per_piece" value="1" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="items_in_stock">Number of items kept in stock</label>
+            <input type="number" id="items_in_stock" value="100">
+          </div>
+          <div class="form-group">
+            <label for="reduction_carrying">Estimated reduction in carrying cost (%)</label>
+            <input type="number" id="reduction_carrying" value="5" step="0.01">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Labor</h2>
+          <div class="form-group">
+            <label for="personnel">Number of personnel to manage inventory</label>
+            <input type="number" id="personnel" value="5">
+          </div>
+          <div class="form-group">
+            <label for="cost_per_person">Average cost per person per month</label>
+            <input type="number" id="cost_per_person" value="3500">
+          </div>
+          <div class="form-group">
+            <label for="reduction_personnel">Reduction in personnel with StockVUE</label>
+            <input type="number" id="reduction_personnel" value="4">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Shrinkage</h2>
+          <div class="form-group">
+            <label for="shrinkage_pct">Percentage lost due to shrinkage (%)</label>
+            <input type="number" id="shrinkage_pct" value="7" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="reduction_shrinkage">Estimated reduction of shrinkage (%)</label>
+            <input type="number" id="reduction_shrinkage" value="5" step="0.01">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Stockouts</h2>
+          <div class="form-group">
+            <label for="stockouts_per_year">Number of stockouts per year</label>
+            <input type="number" id="stockouts_per_year" value="5">
+          </div>
+          <div class="form-group">
+            <label for="loss_per_stockout">Loss per stockout event</label>
+            <input type="number" id="loss_per_stockout" value="100">
+          </div>
+          <div class="form-group">
+            <label for="reduction_stockouts">Estimated reduction of stockouts</label>
+            <input type="number" id="reduction_stockouts" value="3">
+          </div>
+        </section>
+      </div>
+
+      <div class="sections-grid stockvue-costs">
+        <section class="section">
+          <h2>StockVUE Hardware Cost</h2>
+          <div class="form-group">
+            <label for="pct_on_stockvue">Percentage of items on StockVUE (%)</label>
+            <input type="number" id="pct_on_stockvue" value="100" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="pct_small_scale">Small scales (%)</label>
+            <input type="number" id="pct_small_scale" value="40" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="pct_med_scale">Medium scales (%)</label>
+            <input type="number" id="pct_med_scale" value="40" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="pct_large_scale">Large scales (%)</label>
+            <input type="number" id="pct_large_scale" value="20" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="cost_router">Estimated Router unit cost</label>
+            <input type="number" id="cost_router" value="499">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>StockVUE Other Costs</h2>
+          <div class="form-group">
+            <label for="other_cost">Installation & Miscellaneous (first year)</label>
+            <input type="number" id="other_cost" value="14110">
+          </div>
+        </section>
+      </div>
+
+      <button class="calculate-btn" onclick="calculateROI()">Calculate ROI</button>
+
+      <div class="results-section">
+        <h2>Results</h2>
+        <div class="results-grid">
+          <div class="result-card savings">
+            <h3>Annual Savings</h3>
+            <div class="value">$<span id="total_savings">0</span></div>
+          </div>
+          <div class="result-card cost">
+            <h3>Initial Investment</h3>
+            <div class="value">$<span id="total_cost">0</span></div>
+          </div>
+          <div class="result-card irr">
+            <h3>5-Year IRR</h3>
+            <div class="value"><span id="irr_pct">0</span>%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="projection-section">
+        <h2>5-Year Projection</h2>
+        <table id="projection-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Savings</th>
+              <th>Cost</th>
+              <th>ROI (%)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
-</html> 
+</html>
