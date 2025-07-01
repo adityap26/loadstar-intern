@@ -1156,6 +1156,8 @@
         const totalScales = smallCount + medCount + largeCount;
         
         document.getElementById('software_scale_count').value = totalScales;
+        // Auto-update software_base_cost: max(500, totalScales * 1)
+        document.getElementById('software_base_cost').value = Math.max(500, totalScales * 1);
       }
 
       // Add event listeners to hardware count inputs
