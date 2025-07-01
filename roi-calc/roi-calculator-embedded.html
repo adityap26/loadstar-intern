@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockVUE ROI Calculator</title>
+  <style>
+    /* Modern ROI Calculator Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .sections-grid.stockvue-costs {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 2px solid #e9ecef;
+      position: relative;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+
+    .sections-grid.stockvue-costs::before {
+      content: 'StockVUE Investment';
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .section h2 {
+      color: #2c3e50;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section h2::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e8ed;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input:invalid {
+      border-color: #e74c3c;
+      background: #fdf2f2;
+    }
+
+    .calculate-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: block;
+      margin: 40px auto;
+      min-width: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .calculate-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .calculate-btn:hover::before {
+      left: 100%;
+    }
+
+    .calculate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .calculate-btn:active {
+      transform: translateY(0);
+    }
+
+    .results-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 40px 0;
+      text-align: center;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .result-card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .result-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .result-card h3 {
+      color: #6c757d;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .result-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .result-card.savings .value {
+      color: #27ae60;
+    }
+
+    .result-card.cost .value {
+      color: #e74c3c;
+    }
+
+    .result-card.roi .value {
+      color: #f39c12;
+    }
+
+    .result-card.irr .value {
+      color: #9b59b6;
+    }
+
+    .projection-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin: 40px 0;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .cost-breakdown-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin: 40px 0;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .cost-breakdown-section h2 {
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    .cost-breakdown-section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 2px;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .breakdown-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .breakdown-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .breakdown-card.hardware::before {
+      background: linear-gradient(90deg, #3498db, #2980b9);
+    }
+
+    .breakdown-card.software::before {
+      background: linear-gradient(90deg, #e74c3c, #c0392b);
+    }
+
+    .breakdown-card.other::before {
+      background: linear-gradient(90deg, #f39c12, #e67e22);
+    }
+
+    .breakdown-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .breakdown-card h3 {
+      color: #2c3e50;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .breakdown-card.hardware h3::before {
+      content: '🔧';
+      font-size: 1.2rem;
+    }
+
+    .breakdown-card.software h3::before {
+      content: '💻';
+      font-size: 1.2rem;
+    }
+
+    .breakdown-card.other h3::before {
+      content: '📋';
+      font-size: 1.2rem;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-size: 0.95rem;
+    }
+
+    .breakdown-item:last-of-type {
+      border-bottom: none;
+    }
+
+    .breakdown-item span:first-child {
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .breakdown-item span:last-child {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .breakdown-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      margin-top: 15px;
+      border-top: 2px solid rgba(0, 0, 0, 0.1);
+      font-size: 1.1rem;
+    }
+
+    .breakdown-total strong {
+      color: #2c3e50;
+    }
+
+    .breakdown-total strong:last-child {
+      font-size: 1.2rem;
+    }
+
+    .projection-section h2 {
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    #projection-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    #projection-table th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    #projection-table td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 0.9rem;
+    }
+
+    #projection-table tr:hover td {
+      background: #f8f9fa;
+    }
+
+    #projection-table tr:last-child td {
+      border-bottom: none;
+      font-weight: 600;
+    }
+
+    .roi-value {
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .roi-value.positive {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .roi-value.negative {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .irr-row {
+      background: #f8f9fa;
+    }
+
+    .irr-row td {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .irr-value {
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .irr-value.positive {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .irr-value.negative {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+
+      .header {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .sections-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-card .value {
+        font-size: 1.5rem;
+      }
+
+      .breakdown-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .breakdown-card {
+        padding: 20px;
+      }
+
+      .breakdown-item {
+        font-size: 0.9rem;
+      }
+
+      .breakdown-total {
+        font-size: 1rem;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .section:nth-child(1) { animation-delay: 0.1s; }
+    .section:nth-child(2) { animation-delay: 0.2s; }
+    .section:nth-child(3) { animation-delay: 0.3s; }
+    .section:nth-child(4) { animation-delay: 0.4s; }
+    .section:nth-child(5) { animation-delay: 0.5s; }
+    .section:nth-child(6) { animation-delay: 0.6s; }
+
+    .calculate-btn.loading {
+      pointer-events: none;
+    }
+
+    .calculate-btn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .form-group input:focus + label {
+      color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .calculate-btn:focus,
+    .form-group input:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+
+    #projection-table tr {
+      transition: background-color 0.3s ease;
+    }
+
+    #projection-table tr:hover {
+      background: rgba(102, 126, 234, 0.05);
+    }
+
+    .calculate-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .calculate-btn[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      z-index: 1000;
+      margin-bottom: 5px;
+    }
+
+    .calculate-btn[title]:hover::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #333;
+      margin-bottom: -5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>StockVUE ROI Calculator</h1>
+      <p>Calculate your return on investment with our comprehensive inventory management solution</p>
+    </div>
+
+    <div class="content">
+      <div class="sections-grid">
+        <section class="section">
+          <h2>Inventory Carrying Cost</h2>
+          <div class="form-group">
+            <label for="inv_count">Number of items in inventory</label>
+            <input type="number" id="inv_count" value="100">
+          </div>
+          <div class="form-group">
+            <label for="cost_per_piece">Average cost per piece</label>
+            <input type="number" id="cost_per_piece" value="1" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="items_in_stock">Number of items kept in stock</label>
+            <input type="number" id="items_in_stock" value="100">
+          </div>
+          <div class="form-group">
+            <label for="reduction_carrying">Estimated reduction in carrying cost (%)</label>
+            <input type="number" id="reduction_carrying" value="5" step="0.01">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Labor</h2>
+          <div class="form-group">
+            <label for="personnel">Number of personnel to manage inventory</label>
+            <input type="number" id="personnel" value="5">
+          </div>
+          <div class="form-group">
+            <label for="cost_per_person">Average cost per person per month</label>
+            <input type="number" id="cost_per_person" value="3500">
+          </div>
+          <div class="form-group">
+            <label for="reduction_personnel">Reduction in personnel with StockVUE</label>
+            <input type="number" id="reduction_personnel" value="4">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Shrinkage</h2>
+          <div class="form-group">
+            <label for="shrinkage_pct">Percentage lost due to shrinkage (%)</label>
+            <input type="number" id="shrinkage_pct" value="2" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="reduction_shrinkage">Estimated reduction of shrinkage (%)</label>
+            <input type="number" id="reduction_shrinkage" value="5" step="0.01">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Stockouts</h2>
+          <div class="form-group">
+            <label for="stockouts_per_year">Number of stockouts per year</label>
+            <input type="number" id="stockouts_per_year" value="5">
+          </div>
+          <div class="form-group">
+            <label for="loss_per_stockout">Loss per stockout event</label>
+            <input type="number" id="loss_per_stockout" value="100">
+          </div>
+          <div class="form-group">
+            <label for="reduction_stockouts">Estimated reduction of stockouts</label>
+            <input type="number" id="reduction_stockouts" value="3">
+          </div>
+        </section>
+      </div>
+
+      <div class="sections-grid stockvue-costs">
+        <section class="section">
+          <h2>StockVUE Hardware Cost</h2>
+          <div class="form-group">
+            <label for="small_scale_count">Number of Small Scales</label>
+            <input type="number" id="small_scale_count" value="40">
+          </div>
+          <div class="form-group">
+            <label for="med_scale_count">Number of Medium Scales</label>
+            <input type="number" id="med_scale_count" value="40">
+          </div>
+          <div class="form-group">
+            <label for="large_scale_count">Number of Large Scales</label>
+            <input type="number" id="large_scale_count" value="20">
+          </div>
+          <div class="form-group">
+            <label for="cost_router">Estimated Router unit cost</label>
+            <input type="number" id="cost_router" value="499">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>StockVUE Software Costs</h2>
+          <div class="form-group">
+            <label for="software_scale_count">Number of Scales</label>
+            <input type="number" id="software_scale_count" value="100" readonly>
+          </div>
+          <div class="form-group">
+            <label for="software_base_cost">Base Software Support License (monthly)</label>
+            <input type="number" id="software_base_cost" value="500" readonly>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>StockVUE Other Costs</h2>
+          <div class="form-group">
+            <label for="other_cost">Installation & Miscellaneous (first year)</label>
+            <input type="number" id="other_cost" value="14110">
+          </div>
+        </section>
+      </div>
+
+      <button class="calculate-btn" onclick="calculateROI()">Calculate ROI</button>
+
+      <div class="results-section">
+        <h2>Results</h2>
+        <div class="results-grid">
+          <div class="result-card savings">
+            <h3>Annual Savings</h3>
+            <div class="value">$<span id="total_savings">0</span></div>
+          </div>
+          <div class="result-card cost">
+            <h3>Initial Investment</h3>
+            <div class="value">$<span id="total_cost">0</span></div>
+          </div>
+          <div class="result-card irr">
+            <h3>5-Year IRR</h3>
+            <div class="value"><span id="irr_pct">0</span>%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cost-breakdown-section">
+        <h2>Cost Breakdown</h2>
+        <div class="breakdown-grid">
+          <div class="breakdown-card hardware">
+            <h3>Hardware Costs</h3>
+            <div class="breakdown-item">
+              <span>Small Scales:</span>
+              <span id="small_scales_cost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Medium Scales:</span>
+              <span id="med_scales_cost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Large Scales:</span>
+              <span id="large_scales_cost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Routers:</span>
+              <span id="routers_cost">$0</span>
+            </div>
+            <div class="breakdown-total">
+              <strong>Total Hardware:</strong>
+              <strong id="total_hardware_cost">$0</strong>
+            </div>
+          </div>
+
+          <div class="breakdown-card software">
+            <h3>Software Costs</h3>
+            <div class="breakdown-item">
+              <span>Base Software Support License (Annual):</span>
+              <span id="base_license_cost">$0</span>
+            </div>
+            <div class="breakdown-total">
+              <strong>Total Software:</strong>
+              <strong id="total_software_cost">$0</strong>
+            </div>
+          </div>
+
+          <div class="breakdown-card other">
+            <h3>Other Costs</h3>
+            <div class="breakdown-item">
+              <span>Installation & Misc:</span>
+              <span id="other_costs_display">$0</span>
+            </div>
+            <div class="breakdown-total">
+              <strong>Total Other:</strong>
+              <strong id="total_other_cost">$0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="projection-section">
+        <h2>5-Year Projection</h2>
+        <table id="projection-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Savings</th>
+              <th>Cost</th>
+              <th>Net</th>
+              <th>ROI (%)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function calculateROI() {
+      // Add loading state to button
+      const button = document.querySelector('.calculate-btn');
+      button.classList.add('loading');
+      button.textContent = 'Calculating...';
+      
+      // Simulate a small delay for better UX
+      setTimeout(() => {
+        performCalculation();
+        button.classList.remove('loading');
+        button.textContent = 'Calculate ROI';
+        
+        // Scroll to results after calculation
+        setTimeout(scrollToResults, 300);
+      }, 800);
+    }
+
+    function performCalculation() {
+      // Inputs
+      const inv_count = parseFloat(document.getElementById('inv_count').value);
+      const cost_per_piece = parseFloat(document.getElementById('cost_per_piece').value);
+      const items_in_stock = parseFloat(document.getElementById('items_in_stock').value);
+      const reduction_carrying = parseFloat(document.getElementById('reduction_carrying').value) / 100;
+
+      const personnel = parseFloat(document.getElementById('personnel').value);
+      const cost_per_person = parseFloat(document.getElementById('cost_per_person').value);
+      const reduction_personnel = parseFloat(document.getElementById('reduction_personnel').value);
+
+      const shrinkage_pct = parseFloat(document.getElementById('shrinkage_pct').value) / 100;
+      const reduction_shrinkage = parseFloat(document.getElementById('reduction_shrinkage').value) / 100;
+
+      const stockouts_per_year = parseFloat(document.getElementById('stockouts_per_year').value);
+      const loss_per_stockout = parseFloat(document.getElementById('loss_per_stockout').value);
+      const reduction_stockouts = parseFloat(document.getElementById('reduction_stockouts').value);
+
+      const cost_small_scale = 249; // Hardcoded small scale cost
+      const cost_med_scale = 349; // Hardcoded medium scale cost
+      const cost_large_scale = 549; // Hardcoded large scale cost
+      const router_markup = 1.2; // Hardcoded router markup factor
+      const cost_router = parseFloat(document.getElementById('cost_router').value);
+
+      const other_cost = parseFloat(document.getElementById('other_cost').value);
+
+      // Software costs
+      const software_base_cost = parseFloat(document.getElementById('software_base_cost').value);
+
+      // Calculations
+      const averageInventory = items_in_stock * cost_per_piece * inv_count;
+      const annualInventory = averageInventory * 12;
+      const savingsCarrying = annualInventory * reduction_carrying;
+
+      const savingsLabor = (personnel - reduction_personnel) * 12 * cost_per_person;
+
+      const shrinkageLoss = annualInventory * shrinkage_pct;
+      const savingsShrinkage = shrinkageLoss * reduction_shrinkage * -1;
+
+      const savingsStockoutLoss = (loss_per_stockout * stockouts_per_year) * -1;
+      const savingsStockouts = (loss_per_stockout * reduction_stockouts) * -1;
+
+      const totalSavings = savingsCarrying + savingsLabor + savingsShrinkage + savingsStockoutLoss + savingsStockouts;
+
+      // Hardware cost
+      const smallCount = parseFloat(document.getElementById('small_scale_count').value);
+      const medCount = parseFloat(document.getElementById('med_scale_count').value);
+      const largeCount = parseFloat(document.getElementById('large_scale_count').value);
+      const numberScales = smallCount + medCount + largeCount;
+
+      const costSmallTotal = smallCount * cost_small_scale;
+      const costMedTotal = medCount * cost_med_scale;
+      const costLargeTotal = largeCount * cost_large_scale;
+      const routersNeeded = numberScales / 12 * router_markup;
+      const costRouterTotal = routersNeeded * cost_router;
+
+      const totalHardwareCost = costSmallTotal + costMedTotal + costLargeTotal + costRouterTotal;
+
+      // Software cost calculation (recurring)
+      const softwareScaleCount = parseFloat(document.getElementById('software_scale_count').value);
+      const monthlySoftwareCost = Math.max(software_base_cost, softwareScaleCount * 1);
+      const annualSoftwareCost = monthlySoftwareCost * 12;
+
+      // One-time software costs
+      const oneTimeSoftwareCosts = 0; // Assuming no one-time software costs
+
+      // Total costs
+      const year1Cost = totalHardwareCost + annualSoftwareCost + oneTimeSoftwareCosts + other_cost;
+      const ongoingCost = annualSoftwareCost;
+
+      // Calculate 5-year IRR
+      const irr = calculateIRR(totalSavings, year1Cost, ongoingCost);
+
+      // Update results with animation
+      animateNumber('total_savings', totalSavings);
+      animateNumber('total_cost', year1Cost);
+      animateNumber('roi_pct', ((totalSavings - year1Cost) / year1Cost) * 100);
+      animateNumber('irr_pct', irr * 100);
+
+      // Update cost breakdown
+      updateCostBreakdown(
+        costSmallTotal, costMedTotal, costLargeTotal, costRouterTotal, totalHardwareCost,
+        annualSoftwareCost, 0, 0, // Only show annual software cost, set per-scale and support to 0
+        0, 0, annualSoftwareCost,
+        other_cost
+      );
+
+      // 5-Year Projection
+      updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr);
+    }
+
+    // Calculate IRR using Newton-Raphson method
+    function calculateIRR(annualSavings, initialCost, ongoingCost) {
+      const cashFlows = [
+        -initialCost, // Year 0: Initial investment (negative)
+        annualSavings - ongoingCost, // Year 1: Net cash flow
+        annualSavings - ongoingCost, // Year 2: Net cash flow
+        annualSavings - ongoingCost, // Year 3: Net cash flow
+        annualSavings - ongoingCost, // Year 4: Net cash flow
+        annualSavings - ongoingCost  // Year 5: Net cash flow
+      ];
+
+      // Newton-Raphson method to find IRR
+      let guess = 0.1; // Start with 10% guess
+      const tolerance = 0.0001;
+      const maxIterations = 100;
+
+      for (let i = 0; i < maxIterations; i++) {
+        const npv = calculateNPV(cashFlows, guess);
+        const derivative = calculateNPVDerivative(cashFlows, guess);
+        
+        if (Math.abs(derivative) < tolerance) {
+          break; // Avoid division by zero
+        }
+        
+        const newGuess = guess - npv / derivative;
+        
+        if (Math.abs(newGuess - guess) < tolerance) {
+          guess = newGuess;
+          break;
+        }
+        
+        guess = newGuess;
+      }
+
+      // Validate IRR is reasonable (between -100% and 1000%)
+      if (guess < -1 || guess > 10) {
+        return 0; // Return 0% if IRR is unreasonable
+      }
+
+      return guess;
+    }
+
+    // Calculate Net Present Value
+    function calculateNPV(cashFlows, rate) {
+      let npv = 0;
+      for (let i = 0; i < cashFlows.length; i++) {
+        npv += cashFlows[i] / Math.pow(1 + rate, i);
+      }
+      return npv;
+    }
+
+    // Calculate derivative of NPV (for Newton-Raphson)
+    function calculateNPVDerivative(cashFlows, rate) {
+      let derivative = 0;
+      for (let i = 1; i < cashFlows.length; i++) {
+        derivative -= i * cashFlows[i] / Math.pow(1 + rate, i + 1);
+      }
+      return derivative;
+    }
+
+    function animateNumber(elementId, targetValue) {
+      const element = document.getElementById(elementId);
+      if (!element) return; // Skip if element doesn't exist
+      
+      const startValue = parseFloat(element.innerText) || 0;
+      const duration = 1000; // 1 second
+      const startTime = performance.now();
+      
+      function updateNumber(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentValue = startValue + (targetValue - startValue) * easeOutQuart;
+        
+        if (elementId === 'roi_pct' || elementId === 'irr_pct') {
+          element.innerText = currentValue.toFixed(2);
+        } else {
+          element.innerText = formatCurrency(currentValue);
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateNumber);
+        }
+      }
+      
+      requestAnimationFrame(updateNumber);
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function updateCostBreakdown(
+      smallScalesCost, medScalesCost, largeScalesCost, routersCost, totalHardwareCost,
+      baseLicenseCost, perScaleCost, supportCost, setupCost, trainingCost, totalSoftwareCost,
+      otherCost
+    ) {
+      // Update hardware costs
+      const elSmall = document.getElementById('small_scales_cost');
+      if (elSmall) elSmall.textContent = `$${formatCurrency(smallScalesCost)}`;
+      const elMed = document.getElementById('med_scales_cost');
+      if (elMed) elMed.textContent = `$${formatCurrency(medScalesCost)}`;
+      const elLarge = document.getElementById('large_scales_cost');
+      if (elLarge) elLarge.textContent = `$${formatCurrency(largeScalesCost)}`;
+      const elRouters = document.getElementById('routers_cost');
+      if (elRouters) elRouters.textContent = `$${formatCurrency(routersCost)}`;
+      const elTotalHardware = document.getElementById('total_hardware_cost');
+      if (elTotalHardware) elTotalHardware.textContent = `$${formatCurrency(totalHardwareCost)}`;
+
+      // Update software costs
+      const elBaseLicense = document.getElementById('base_license_cost');
+      if (elBaseLicense) elBaseLicense.textContent = `$${formatCurrency(baseLicenseCost)}`;
+      const elPerScale = document.getElementById('per_scale_cost');
+      if (elPerScale) elPerScale.textContent = `$${formatCurrency(perScaleCost)}`;
+      const elSupport = document.getElementById('support_cost');
+      if (elSupport) elSupport.textContent = `$${formatCurrency(supportCost)}`;
+      const elSetup = document.getElementById('setup_cost');
+      if (elSetup) elSetup.textContent = `$${formatCurrency(setupCost)}`;
+      const elTraining = document.getElementById('training_cost');
+      if (elTraining) elTraining.textContent = `$${formatCurrency(trainingCost)}`;
+      const elTotalSoftware = document.getElementById('total_software_cost');
+      if (elTotalSoftware) elTotalSoftware.textContent = `$${formatCurrency(totalSoftwareCost)}`;
+
+      // Update other costs
+      const elOtherDisplay = document.getElementById('other_costs_display');
+      if (elOtherDisplay) elOtherDisplay.textContent = `$${formatCurrency(otherCost)}`;
+      const elTotalOther = document.getElementById('total_other_cost');
+      if (elTotalOther) elTotalOther.textContent = `$${formatCurrency(otherCost)}`;
+    }
+
+    function updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr) {
+      const tbody = document.querySelector('#projection-table tbody');
+      tbody.innerHTML = '';
+      
+      for (let year = 1; year <= 5; year++) {
+        const cost = year === 1 ? year1Cost : ongoingCost;
+        const net = totalSavings - cost;
+        const roi = (net / year1Cost) * 100;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${year}</td>
+          <td>$${formatCurrency(totalSavings)}</td>
+          <td>$${formatCurrency(cost)}</td>
+          <td>$${formatCurrency(net)}</td>
+          <td class="roi-value ${roi >= 0 ? 'positive' : 'negative'}">${roi.toFixed(2)}%</td>
+        `;
+        tbody.appendChild(row);
+      }
+      
+      // Add IRR row
+      const irrRow = document.createElement('tr');
+      irrRow.className = 'irr-row';
+      irrRow.innerHTML = `
+        <td colspan="4"><strong>5-Year IRR</strong></td>
+        <td class="irr-value ${irr >= 0 ? 'positive' : 'negative'}">${(irr * 100).toFixed(2)}%</td>
+      `;
+      tbody.appendChild(irrRow);
+    }
+
+    // Auto-update software scale count when hardware counts change
+    document.addEventListener('DOMContentLoaded', function() {
+      function updateSoftwareScaleCount() {
+        const smallCount = parseFloat(document.getElementById('small_scale_count').value) || 0;
+        const medCount = parseFloat(document.getElementById('med_scale_count').value) || 0;
+        const largeCount = parseFloat(document.getElementById('large_scale_count').value) || 0;
+        const totalScales = smallCount + medCount + largeCount;
+        
+        document.getElementById('software_scale_count').value = totalScales;
+      }
+
+      // Add event listeners to hardware count inputs
+      document.getElementById('small_scale_count').addEventListener('input', updateSoftwareScaleCount);
+      document.getElementById('med_scale_count').addEventListener('input', updateSoftwareScaleCount);
+      document.getElementById('large_scale_count').addEventListener('input', updateSoftwareScaleCount);
+      
+      // Initial update
+      updateSoftwareScaleCount();
+    });
+
+    function scrollToResults() {
+      const resultsSection = document.querySelector('.results-section');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
+</body>
+</html> 
