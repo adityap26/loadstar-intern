@@ -33,10 +33,6 @@ function performCalculation() {
   const loss_per_stockout = parseFloat(document.getElementById('loss_per_stockout').value);
   const reduction_stockouts = parseFloat(document.getElementById('reduction_stockouts').value);
 
-  const pct_on_stockvue = parseFloat(document.getElementById('pct_on_stockvue').value) / 100;
-  const pct_small_scale = parseFloat(document.getElementById('pct_small_scale').value) / 100;
-  const pct_med_scale = parseFloat(document.getElementById('pct_med_scale').value) / 100;
-  const pct_large_scale = parseFloat(document.getElementById('pct_large_scale').value) / 100;
   const cost_small_scale = 249; // Hardcoded small scale cost
   const cost_med_scale = 349; // Hardcoded medium scale cost
   const cost_large_scale = 549; // Hardcoded large scale cost
@@ -44,6 +40,9 @@ function performCalculation() {
   const cost_router = parseFloat(document.getElementById('cost_router').value);
 
   const other_cost = parseFloat(document.getElementById('other_cost').value);
+
+  // Software costs
+  const software_base_cost = parseFloat(document.getElementById('software_base_cost').value);
 
   // Calculations
   const averageInventory = items_in_stock * cost_per_piece * inv_count;
@@ -61,10 +60,10 @@ function performCalculation() {
   const totalSavings = savingsCarrying + savingsLabor + savingsShrinkage + savingsStockoutLoss + savingsStockouts;
 
   // Hardware cost
-  const numberScales = inv_count * pct_on_stockvue;
-  const smallCount = numberScales * pct_small_scale;
-  const medCount = numberScales * pct_med_scale;
-  const largeCount = numberScales * pct_large_scale;
+  const smallCount = parseFloat(document.getElementById('small_scale_count').value);
+  const medCount = parseFloat(document.getElementById('med_scale_count').value);
+  const largeCount = parseFloat(document.getElementById('large_scale_count').value);
+  const numberScales = smallCount + medCount + largeCount;
 
   const costSmallTotal = smallCount * cost_small_scale;
   const costMedTotal = medCount * cost_med_scale;
@@ -74,12 +73,17 @@ function performCalculation() {
 
   const totalHardwareCost = costSmallTotal + costMedTotal + costLargeTotal + costRouterTotal;
 
-  // Software cost
-  const monthlySoftware = Math.max(500, numberScales * 1);
-  const totalSoftwareCost = monthlySoftware * 12;
+  // Software cost calculation (recurring)
+  const softwareScaleCount = parseFloat(document.getElementById('software_scale_count').value);
+  const monthlySoftwareCost = Math.max(software_base_cost, softwareScaleCount * 1);
+  const annualSoftwareCost = monthlySoftwareCost * 12;
 
-  const year1Cost = totalHardwareCost + totalSoftwareCost + other_cost;
-  const ongoingCost = totalSoftwareCost;
+  // One-time software costs
+  const oneTimeSoftwareCosts = 0; // Assuming no one-time software costs
+
+  // Total costs
+  const year1Cost = totalHardwareCost + annualSoftwareCost + oneTimeSoftwareCosts + other_cost;
+  const ongoingCost = annualSoftwareCost;
 
   // Calculate 5-year IRR
   const irr = calculateIRR(totalSavings, year1Cost, ongoingCost);
@@ -89,6 +93,14 @@ function performCalculation() {
   animateNumber('total_cost', year1Cost);
   animateNumber('roi_pct', ((totalSavings - year1Cost) / year1Cost) * 100);
   animateNumber('irr_pct', irr * 100);
+
+  // Update cost breakdown
+  updateCostBreakdown(
+    costSmallTotal, costMedTotal, costLargeTotal, costRouterTotal, totalHardwareCost,
+    annualSoftwareCost, 0, 0, // Only show annual software cost, set per-scale and support to 0
+    0, 0, annualSoftwareCost,
+    other_cost
+  );
 
   // 5-Year Projection
   updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr);
@@ -192,13 +204,52 @@ function formatCurrency(value) {
   }).format(value);
 }
 
+function updateCostBreakdown(
+  smallScalesCost, medScalesCost, largeScalesCost, routersCost, totalHardwareCost,
+  baseLicenseCost, perScaleCost, supportCost, setupCost, trainingCost, totalSoftwareCost,
+  otherCost
+) {
+  // Update hardware costs
+  const elSmall = document.getElementById('small_scales_cost');
+  if (elSmall) elSmall.textContent = `$${formatCurrency(smallScalesCost)}`;
+  const elMed = document.getElementById('med_scales_cost');
+  if (elMed) elMed.textContent = `$${formatCurrency(medScalesCost)}`;
+  const elLarge = document.getElementById('large_scales_cost');
+  if (elLarge) elLarge.textContent = `$${formatCurrency(largeScalesCost)}`;
+  const elRouters = document.getElementById('routers_cost');
+  if (elRouters) elRouters.textContent = `$${formatCurrency(routersCost)}`;
+  const elTotalHardware = document.getElementById('total_hardware_cost');
+  if (elTotalHardware) elTotalHardware.textContent = `$${formatCurrency(totalHardwareCost)}`;
+
+  // Update software costs
+  const elBaseLicense = document.getElementById('base_license_cost');
+  if (elBaseLicense) elBaseLicense.textContent = `$${formatCurrency(baseLicenseCost)}`;
+  const elPerScale = document.getElementById('per_scale_cost');
+  if (elPerScale) elPerScale.textContent = `$${formatCurrency(perScaleCost)}`;
+  const elSupport = document.getElementById('support_cost');
+  if (elSupport) elSupport.textContent = `$${formatCurrency(supportCost)}`;
+  const elSetup = document.getElementById('setup_cost');
+  if (elSetup) elSetup.textContent = `$${formatCurrency(setupCost)}`;
+  const elTraining = document.getElementById('training_cost');
+  if (elTraining) elTraining.textContent = `$${formatCurrency(trainingCost)}`;
+  const elTotalSoftware = document.getElementById('total_software_cost');
+  if (elTotalSoftware) elTotalSoftware.textContent = `$${formatCurrency(totalSoftwareCost)}`;
+
+  // Update other costs
+  const elOtherDisplay = document.getElementById('other_costs_display');
+  if (elOtherDisplay) elOtherDisplay.textContent = `$${formatCurrency(otherCost)}`;
+  const elTotalOther = document.getElementById('total_other_cost');
+  if (elTotalOther) elTotalOther.textContent = `$${formatCurrency(otherCost)}`;
+}
+
 function updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr) {
   const tbody = document.querySelector('#projection-table tbody');
   tbody.innerHTML = '';
   
   for (let year = 1; year <= 5; year++) {
     const cost = year === 1 ? year1Cost : ongoingCost;
-    const roi = ((totalSavings - cost) / cost) * 100;
+    const net = totalSavings - cost;
+    const roi = (net / cost) * 100;
     const tr = document.createElement('tr');
     
     // Add animation delay for each row
@@ -210,6 +261,7 @@ function updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr) {
       <td><strong>Year ${year}</strong></td>
       <td>$${formatCurrency(totalSavings)}</td>
       <td>$${formatCurrency(cost)}</td>
+      <td>$${formatCurrency(net)}</td>
       <td><span class="roi-value ${roi >= 0 ? 'positive' : 'negative'}">${roi.toFixed(2)}%</span></td>
     `;
     
@@ -227,7 +279,7 @@ function updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr) {
   const irrRow = document.createElement('tr');
   irrRow.className = 'irr-row';
   irrRow.innerHTML = `
-    <td colspan="3"><strong>5-Year IRR</strong></td>
+    <td colspan="4"><strong>5-Year IRR</strong></td>
     <td><span class="irr-value ${irr >= 0 ? 'positive' : 'negative'}">${(irr * 100).toFixed(2)}%</span></td>
   `;
   tbody.appendChild(irrRow);
@@ -259,6 +311,22 @@ document.addEventListener('DOMContentLoaded', function() {
       this.parentElement.style.transform = 'scale(1)';
     });
   });
+  
+  // Automatically update Number of Scales (software_scale_count)
+  function updateSoftwareScaleCount() {
+    const small = parseInt(document.getElementById('small_scale_count').value) || 0;
+    const med = parseInt(document.getElementById('med_scale_count').value) || 0;
+    const large = parseInt(document.getElementById('large_scale_count').value) || 0;
+    const totalScales = small + med + large;
+    document.getElementById('software_scale_count').value = totalScales;
+    // Auto-update software_base_cost: max(500, totalScales * 1)
+    document.getElementById('software_base_cost').value = Math.max(500, totalScales * 1);
+  }
+  document.getElementById('small_scale_count').addEventListener('input', updateSoftwareScaleCount);
+  document.getElementById('med_scale_count').addEventListener('input', updateSoftwareScaleCount);
+  document.getElementById('large_scale_count').addEventListener('input', updateSoftwareScaleCount);
+  // Initial update
+  updateSoftwareScaleCount();
   
   // Add keyboard shortcuts
   document.addEventListener('keydown', function(e) {

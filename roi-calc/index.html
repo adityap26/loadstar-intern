@@ -55,7 +55,7 @@
           <h2>Shrinkage</h2>
           <div class="form-group">
             <label for="shrinkage_pct">Percentage lost due to shrinkage (%)</label>
-            <input type="number" id="shrinkage_pct" value="7" step="0.01">
+            <input type="number" id="shrinkage_pct" value="2" step="0.01">
           </div>
           <div class="form-group">
             <label for="reduction_shrinkage">Estimated reduction of shrinkage (%)</label>
@@ -84,24 +84,32 @@
         <section class="section">
           <h2>StockVUE Hardware Cost</h2>
           <div class="form-group">
-            <label for="pct_on_stockvue">Percentage of items on StockVUE (%)</label>
-            <input type="number" id="pct_on_stockvue" value="100" step="0.01">
+            <label for="small_scale_count">Number of Small Scales</label>
+            <input type="number" id="small_scale_count" value="40">
           </div>
           <div class="form-group">
-            <label for="pct_small_scale">Small scales (%)</label>
-            <input type="number" id="pct_small_scale" value="40" step="0.01">
+            <label for="med_scale_count">Number of Medium Scales</label>
+            <input type="number" id="med_scale_count" value="40">
           </div>
           <div class="form-group">
-            <label for="pct_med_scale">Medium scales (%)</label>
-            <input type="number" id="pct_med_scale" value="40" step="0.01">
-          </div>
-          <div class="form-group">
-            <label for="pct_large_scale">Large scales (%)</label>
-            <input type="number" id="pct_large_scale" value="20" step="0.01">
+            <label for="large_scale_count">Number of Large Scales</label>
+            <input type="number" id="large_scale_count" value="20">
           </div>
           <div class="form-group">
             <label for="cost_router">Estimated Router unit cost</label>
             <input type="number" id="cost_router" value="499">
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>StockVUE Software Costs</h2>
+          <div class="form-group">
+            <label for="software_scale_count">Number of Scales</label>
+            <input type="number" id="software_scale_count" value="100" readonly>
+          </div>
+          <div class="form-group">
+            <label for="software_base_cost">Base Software Support License (monthly)</label>
+            <input type="number" id="software_base_cost" value="500" readonly>
           </div>
         </section>
 
@@ -134,6 +142,59 @@
         </div>
       </div>
 
+      <div class="cost-breakdown-section">
+        <h2>Cost Breakdown</h2>
+        <div class="breakdown-grid">
+          <div class="breakdown-card hardware">
+            <h3>Hardware Costs</h3>
+            <div class="breakdown-item">
+              <span>Small Scales:</span>
+              <span id="small_scales_cost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Medium Scales:</span>
+              <span id="med_scales_cost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Large Scales:</span>
+              <span id="large_scales_cost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span>Routers:</span>
+              <span id="routers_cost">$0</span>
+            </div>
+            <div class="breakdown-total">
+              <strong>Total Hardware:</strong>
+              <strong id="total_hardware_cost">$0</strong>
+            </div>
+          </div>
+
+          <div class="breakdown-card software">
+            <h3>Software Costs</h3>
+            <div class="breakdown-item">
+              <span>Base Software Support License (Annual):</span>
+              <span id="base_license_cost">$0</span>
+            </div>
+            <div class="breakdown-total">
+              <strong>Total Software:</strong>
+              <strong id="total_software_cost">$0</strong>
+            </div>
+          </div>
+
+          <div class="breakdown-card other">
+            <h3>Other Costs</h3>
+            <div class="breakdown-item">
+              <span>Installation & Misc:</span>
+              <span id="other_costs_display">$0</span>
+            </div>
+            <div class="breakdown-total">
+              <strong>Total Other:</strong>
+              <strong id="total_other_cost">$0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="projection-section">
         <h2>5-Year Projection</h2>
         <table id="projection-table">
@@ -142,6 +203,7 @@
               <th>Year</th>
               <th>Savings</th>
               <th>Cost</th>
+              <th>Net</th>
               <th>ROI (%)</th>
             </tr>
           </thead>
