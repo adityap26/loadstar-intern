@@ -853,7 +853,7 @@
         </section>
       </div>
 
-      <button class="calculate-btn" onclick="calculateROI()">Calculate ROI</button>
+      <button class="calculate-btn" onclick="openLeadCaptureModal()">Calculate ROI</button>
 
       <div class="results-section">
         <h2>Results</h2>
@@ -940,6 +940,9 @@
           </thead>
           <tbody></tbody>
         </table>
+        <div style="margin-top:18px;padding:12px 18px;background:#fff3cd;border:1px solid #ffeeba;border-radius:8px;color:#856404;font-size:1rem;text-align:center;">
+          This estimate does not serve as a quote, please contact us for an accurate estimate for your needs.
+        </div>
       </div>
       <!-- Printable Summary Section -->
       <div class="print-summary" id="print-summary" style="display:none;">
@@ -957,6 +960,19 @@
         </table>
       </div>
       <button class="print-btn" onclick="showPrintSummary()">Print Summary</button>
+    </div>
+  </div>
+
+  <!-- Lead Capture Modal with Zoho Form -->
+  <div id="lead-capture-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,62,80,0.4);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:white;padding:0 0 24px 0;border-radius:16px;max-width:420px;width:95vw;box-shadow:0 8px 32px rgba(44,62,80,0.18);position:relative;display:flex;flex-direction:column;align-items:center;">
+      <button onclick="closeLeadCaptureModal()" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
+      <h2 style="font-size:1.2rem;margin:24px 0 10px 0;text-align:center;">Enter your details to continue</h2>
+      <iframe id="zoho-lead-iframe" src="https://forms.zohopublic.com/divloadsta1/form/EstimateyourROI/formperma/CrvcnKQzVmIg7KtlZDOh7EnByw7ZNsQp9nxKlZFdKQY" width="100%" height="350" frameborder="0" style="border-radius:8px;overflow:hidden;"></iframe>
+      <div id="after-lead-submit" style="display:none;margin-top:18px;text-align:center;">
+        <button onclick="afterLeadContinue()" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:12px 32px;border-radius:8px;font-size:1.1rem;font-weight:600;cursor:pointer;">Continue</button>
+      </div>
+      <div style="font-size:0.95rem;color:#888;margin-top:10px;">After submitting the form, click Continue below.</div>
     </div>
   </div>
 
@@ -1341,6 +1357,13 @@
             </div>
           </td>
         </tr>
+        <tr>
+          <td colspan="2" style="padding-top:8px;">
+            <div style="margin:12px auto 0 auto;padding:10px 16px;background:#fff3cd;border:1px solid #ffeeba;border-radius:8px;color:#856404;font-size:12px;text-align:center;max-width:600px;">
+              This estimate does not serve as a quote, please contact us for an accurate estimate for your needs.
+            </div>
+          </td>
+        </tr>
       `;
 
       document.querySelector('#print-summary .print-table tbody').innerHTML = html;
@@ -1353,6 +1376,37 @@
         document.getElementById('print-summary').style.display = 'none';
       }, 1000);
     }
+
+    // Lead Capture Modal Logic (iframe version)
+    document.addEventListener('DOMContentLoaded', function() {
+      window.leadCaptured = false;
+      window.openLeadCaptureModal = function() {
+        if (window.leadCaptured) {
+          calculateROI();
+          return;
+        }
+        document.getElementById('lead-capture-modal').style.display = 'flex';
+        document.getElementById('after-lead-submit').style.display = 'none';
+        // Reset iframe (in case user opens modal again)
+        document.getElementById('zoho-lead-iframe').src = 'https://forms.zohopublic.com/divloadsta1/form/EstimateyourROI/formperma/CrvcnKQzVmIg7KtlZDOh7EnByw7ZNsQp9nxKlZFdKQY';
+      }
+      window.closeLeadCaptureModal = function() {
+        document.getElementById('lead-capture-modal').style.display = 'none';
+      }
+      // Show Continue button after a delay (user submits form)
+      document.getElementById('zoho-lead-iframe').addEventListener('load', function() {
+        setTimeout(function() {
+          document.getElementById('after-lead-submit').style.display = 'block';
+        }, 10000); // Changed from 5000 to 10000 (10 seconds)
+      });
+      window.afterLeadContinue = function() {
+        window.closeLeadCaptureModal();
+        window.leadCaptured = true;
+        setTimeout(function() {
+          calculateROI();
+        }, 200);
+      }
+    });
   </script>
 </body>
 </html> 
