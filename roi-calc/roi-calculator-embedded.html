@@ -334,6 +334,9 @@
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .breakdown-card::before {
@@ -412,21 +415,7 @@
     }
 
     .breakdown-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 0;
-      margin-top: 15px;
-      border-top: 2px solid rgba(0, 0, 0, 0.1);
-      font-size: 1.1rem;
-    }
-
-    .breakdown-total strong {
-      color: #2c3e50;
-    }
-
-    .breakdown-total strong:last-child {
-      font-size: 1.2rem;
+      margin-top: auto;
     }
 
     .projection-section h2 {
@@ -767,7 +756,7 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.08);
       }
       .print-table th {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(90deg, #667eea 0%, #667eea 100%) !important;
         color: white !important;
         font-weight: 700;
         font-size: 1em;
@@ -841,6 +830,49 @@
         font-weight: bold;
         letter-spacing: 1px;
       }
+      .print-input-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 24px;
+        margin-top: 10px;
+        max-width: 520px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .print-input-card {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 18px 18px 12px 18px;
+        border: 2.5px solid #e1e8ed;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        margin-bottom: 0;
+        min-width: 0;
+        max-width: 240px;
+      }
+      .print-input-title {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 1.08em;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #e1e8ed;
+        padding-bottom: 6px;
+        background: none;
+      }
+      .print-input-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        font-size: 11px;
+      }
+      .print-input-item span:first-child {
+        color: #6c757d;
+      }
+      .print-input-item span:last-child {
+        color: #2c3e50;
+        font-weight: 600;
+      }
     }
     .print-btn {
       margin: 20px auto 0 auto;
@@ -852,6 +884,9 @@
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
+    }
+    .breakdown-items {
+      flex: 1 1 auto;
     }
   </style>
 </head>
@@ -871,7 +906,7 @@
             <input type="number" id="inv_count" value="100">
           </div>
           <div class="form-group">
-            <label for="cost_per_piece">Average cost per piece</label>
+            <label for="cost_per_piece">Average cost per piece ($)</label>
             <input type="number" id="cost_per_piece" value="1" step="0.01">
           </div>
           <div class="form-group">
@@ -891,7 +926,7 @@
             <input type="number" id="personnel" value="5">
           </div>
           <div class="form-group">
-            <label for="cost_per_person">Average cost per person per month</label>
+            <label for="cost_per_person">Average cost per person per month ($)</label>
             <input type="number" id="cost_per_person" value="3500">
           </div>
           <div class="form-group">
@@ -903,7 +938,7 @@
         <section class="section">
           <h2>Shrinkage</h2>
           <div class="form-group">
-            <label for="shrinkage_pct">Percentage lost due to shrinkage (%)</label>
+            <label for="shrinkage_pct">Annual percentage lost due to shrinkage (%)</label>
             <input type="number" id="shrinkage_pct" value="2" step="0.01">
           </div>
           <div class="form-group">
@@ -919,7 +954,7 @@
             <input type="number" id="stockouts_per_year" value="5">
           </div>
           <div class="form-group">
-            <label for="loss_per_stockout">Loss per stockout event</label>
+            <label for="loss_per_stockout">Loss per stockout event ($)</label>
             <input type="number" id="loss_per_stockout" value="100">
           </div>
           <div class="form-group">
@@ -945,7 +980,7 @@
             <input type="number" id="large_scale_count" value="20">
           </div>
           <div class="form-group">
-            <label for="cost_router">Estimated Router unit cost</label>
+            <label for="cost_router">Estimated Router unit cost ($)</label>
             <input type="number" id="cost_router" value="499">
           </div>
         </section>
@@ -957,7 +992,7 @@
             <input type="number" id="software_scale_count" value="100" readonly>
           </div>
           <div class="form-group">
-            <label for="software_base_cost">Base Software Support License (monthly)</label>
+            <label for="software_base_cost">Base Software & Support License (monthly) ($)</label>
             <input type="number" id="software_base_cost" value="500" readonly>
           </div>
         </section>
@@ -965,7 +1000,7 @@
         <section class="section">
           <h2>StockVUE Other Costs</h2>
           <div class="form-group">
-            <label for="other_cost">Installation & Miscellaneous (first year)</label>
+            <label for="other_cost">Installation & Miscellaneous (first year) ($)</label>
             <input type="number" id="other_cost" value="14110">
           </div>
         </section>
@@ -996,21 +1031,23 @@
         <div class="breakdown-grid">
           <div class="breakdown-card hardware">
             <h3>Hardware Costs</h3>
-            <div class="breakdown-item">
-              <span>Small Scales:</span>
-              <span id="small_scales_cost">$0</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Medium Scales:</span>
-              <span id="med_scales_cost">$0</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Large Scales:</span>
-              <span id="large_scales_cost">$0</span>
-            </div>
-            <div class="breakdown-item">
-              <span>Routers:</span>
-              <span id="routers_cost">$0</span>
+            <div class="breakdown-items">
+              <div class="breakdown-item">
+                <span>Small Scales:</span>
+                <span id="small_scales_cost">$0</span>
+              </div>
+              <div class="breakdown-item">
+                <span>Medium Scales:</span>
+                <span id="med_scales_cost">$0</span>
+              </div>
+              <div class="breakdown-item">
+                <span>Large Scales:</span>
+                <span id="large_scales_cost">$0</span>
+              </div>
+              <div class="breakdown-item">
+                <span>Routers:</span>
+                <span id="routers_cost">$0</span>
+              </div>
             </div>
             <div class="breakdown-total">
               <strong>Total Hardware:</strong>
@@ -1020,9 +1057,11 @@
 
           <div class="breakdown-card software">
             <h3>Software Costs</h3>
-            <div class="breakdown-item">
-              <span>Base Software Support License (Annual):</span>
-              <span id="base_license_cost">$0</span>
+            <div class="breakdown-items">
+              <div class="breakdown-item">
+                <span>Base Software & Support License (Annual):</span>
+                <span id="base_license_cost">$0</span>
+              </div>
             </div>
             <div class="breakdown-total">
               <strong>Total Software:</strong>
@@ -1032,9 +1071,11 @@
 
           <div class="breakdown-card other">
             <h3>Other Costs</h3>
-            <div class="breakdown-item">
-              <span>Installation & Misc:</span>
-              <span id="other_costs_display">$0</span>
+            <div class="breakdown-items">
+              <div class="breakdown-item">
+                <span>Installation & Misc:</span>
+                <span id="other_costs_display">$0</span>
+              </div>
             </div>
             <div class="breakdown-total">
               <strong>Total Other:</strong>
@@ -1072,7 +1113,7 @@
         </div>
         <div class="print-page print-inputs">
           <h2 style="font-size:1.1rem;margin-bottom:8px;">StockVUE ROI Calculator - Inputs</h2>
-          <table class="print-table" id="print-inputs-table" style="width:100%;"></table>
+          <div class="print-input-cards" id="print-input-cards"></div>
           <div class="print-investment-section">
             <div class="print-investment-header">StockVUE Investment</div>
             <div class="print-breakdown-cards" id="print-investment-cards"></div>
@@ -1424,30 +1465,50 @@
 
     // Printable summary logic
     function showPrintSummary() {
-      // Page 1: Inputs
-      const inputs = [
-        { label: "Inventory Count", value: document.getElementById('inv_count').value },
-        { label: "Cost per Piece", value: document.getElementById('cost_per_piece').value },
-        { label: "Items in Stock", value: document.getElementById('items_in_stock').value },
-        { label: "Carrying Cost Reduction (%)", value: document.getElementById('reduction_carrying').value },
-        { label: "Personnel", value: document.getElementById('personnel').value },
-        { label: "Cost per Person", value: document.getElementById('cost_per_person').value },
-        { label: "Reduction in Personnel", value: document.getElementById('reduction_personnel').value },
-        { label: "Shrinkage (%)", value: document.getElementById('shrinkage_pct').value },
-        { label: "Shrinkage Reduction (%)", value: document.getElementById('reduction_shrinkage').value },
-        { label: "Stockouts per Year", value: document.getElementById('stockouts_per_year').value },
-        { label: "Loss per Stockout", value: document.getElementById('loss_per_stockout').value },
-        { label: "Stockout Reduction", value: document.getElementById('reduction_stockouts').value }
+      // Grouped Inputs for Print Cards
+      const inputGroups = [
+        {
+          title: 'Inventory Carrying Cost',
+          items: [
+            { label: 'Number of items in inventory', value: document.getElementById('inv_count').value },
+            { label: 'Average cost per piece ($)', value: document.getElementById('cost_per_piece').value },
+            { label: 'Number of items kept in stock', value: document.getElementById('items_in_stock').value },
+            { label: 'Estimated reduction in carrying cost (%)', value: document.getElementById('reduction_carrying').value }
+          ]
+        },
+        {
+          title: 'Labor',
+          items: [
+            { label: 'Number of personnel to manage inventory', value: document.getElementById('personnel').value },
+            { label: 'Average cost per person per month ($)', value: document.getElementById('cost_per_person').value },
+            { label: 'Reduction in personnel with StockVUE', value: document.getElementById('reduction_personnel').value }
+          ]
+        },
+        {
+          title: 'Shrinkage',
+          items: [
+            { label: 'Annual percentage lost due to shrinkage (%)', value: document.getElementById('shrinkage_pct').value },
+            { label: 'Estimated reduction of shrinkage (%)', value: document.getElementById('reduction_shrinkage').value }
+          ]
+        },
+        {
+          title: 'Stockouts',
+          items: [
+            { label: 'Number of stockouts per year', value: document.getElementById('stockouts_per_year').value },
+            { label: 'Loss per stockout event ($)', value: document.getElementById('loss_per_stockout').value },
+            { label: 'Estimated reduction of stockouts', value: document.getElementById('reduction_stockouts').value }
+          ]
+        }
       ];
-      let inputsTable = '<tbody>';
-      for (let i = 0; i < inputs.length; i += 2) {
-        inputsTable += '<tr>' +
-          `<td><strong>${inputs[i].label}:</strong> ${inputs[i].value}</td>` +
-          (inputs[i+1] ? `<td><strong>${inputs[i+1].label}:</strong> ${inputs[i+1].value}</td>` : '<td></td>') +
-          '</tr>';
-      }
-      inputsTable += '</tbody>';
-      document.getElementById('print-inputs-table').innerHTML = inputsTable;
+      let inputCardsHTML = '';
+      inputGroups.forEach(group => {
+        inputCardsHTML += `<div class='print-input-card'><div class='print-input-title'>${group.title}</div>`;
+        group.items.forEach(item => {
+          inputCardsHTML += `<div class='print-input-item'><span>${item.label}:</span><span>${item.value}</span></div>`;
+        });
+        inputCardsHTML += '</div>';
+      });
+      document.getElementById('print-input-cards').innerHTML = inputCardsHTML;
 
       // StockVUE Investment Section
       const investmentCards = [
@@ -1517,12 +1578,11 @@
       ];
       let breakdownHTML = '';
       breakdownCards.forEach(card => {
-        breakdownHTML += `<div><div style='font-weight:600;font-size:1.05em;margin-bottom:8px;'>${card.title}</div>`;
+        breakdownHTML += `<div style="display:flex;flex-direction:column;height:180px;"><div style='font-weight:600;font-size:1.05em;margin-bottom:8px;'>${card.title}</div><div style='flex:1 1 auto;'>`;
         card.items.forEach(item => {
           breakdownHTML += `<div style='display:flex;justify-content:space-between;margin-bottom:4px;'><span>${item.label}:</span><span>${item.value}</span></div>`;
         });
-        breakdownHTML += `<div style='display:flex;justify-content:space-between;margin-top:10px;font-weight:700;'><span>${card.total.label}:</span><span>${card.total.value}</span></div>`;
-        breakdownHTML += '</div>';
+        breakdownHTML += `</div><div style='display:flex;justify-content:space-between;margin-top:auto;font-weight:700;'><span>${card.total.label}:</span><span>${card.total.value}</span></div></div>`;
       });
       document.getElementById('print-breakdown-cards').innerHTML = breakdownHTML;
 
