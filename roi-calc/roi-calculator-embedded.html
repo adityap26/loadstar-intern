@@ -670,58 +670,153 @@
         padding: 0 !important;
         box-sizing: border-box !important;
         font-size: 10px !important;
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
       body * {
         visibility: hidden !important;
       }
       #print-summary, #print-summary * {
         visibility: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
       #print-summary {
         position: absolute;
-        left: 0; top: 0; width: calc(100vw - 16px); /* add margin for printer tolerance */
-        background: white;
+        left: 0; top: 0; width: 100vw;
+        background: #f8f9fa;
         color: #222;
-        padding: 8px 8px 8px 8px !important;
-        font-size: 10px !important;
-        margin: 0 !important;
+        padding: 0;
+        margin: 0;
         box-sizing: border-box;
-        page-break-inside: avoid !important;
-        overflow-x: auto;
       }
-      .print-btn, .calculate-btn {
-        display: none !important;
+      .print-page {
+        background: white;
+        margin: 24px auto;
+        padding: 32px 32px 24px 32px;
+        border-radius: 18px;
+        box-shadow: none !important;
+        max-width: 900px;
+        min-height: 90vh;
+        box-sizing: border-box;
+      }
+      .print-page h2 {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 18px 20px 16px 20px;
+        border-radius: 16px 16px 0 0;
+        font-size: 1.6rem !important;
+        margin-bottom: 18px !important;
+        margin-top: 0 !important;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        letter-spacing: 0.5px;
+      }
+      .print-costs {
+        page-break-before: always;
+        margin-top: 0 !important;
+      }
+      .print-costs h2 {
+        margin-top: 0 !important;
+      }
+      .print-breakdown-cards {
+        display: flex;
+        gap: 18px;
+        margin-top: 12px;
+        margin-bottom: 40px;
+      }
+      .print-breakdown-cards > div {
+        flex: 1;
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 18px 18px 18px 18px;
+        border: 2.5px solid #e1e8ed;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        position: relative;
+      }
+      .print-breakdown-cards > div:nth-child(1) {
+        border-top: 6px solid #3498db;
+      }
+      .print-breakdown-cards > div:nth-child(2) {
+        border-top: 6px solid #e74c3c;
+      }
+      .print-breakdown-cards > div:nth-child(3) {
+        border-top: 6px solid #f39c12;
+      }
+      .print-breakdown-cards > div > div:first-child {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 1.08em;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #e1e8ed;
+        padding-bottom: 6px;
+        background: none;
+      }
+      .print-breakdown-cards span {
+        color: #333;
       }
       .print-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 2px;
-        font-size: 10px !important;
-        table-layout: fixed;
-        word-break: break-word;
+        margin-top: 12px;
+        font-size: 11px !important;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
       }
-      .print-table th, .print-table td {
-        border: 1px solid #ccc;
-        padding: 2px 4px !important;
-        font-size: 10px !important;
+      .print-table th {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-weight: 700;
+        font-size: 1em;
+        padding: 12px 10px !important;
+        border: none;
+      }
+      .print-table td {
+        border: 1px solid #e1e8ed;
+        padding: 10px 10px !important;
+        font-size: 12px !important;
         vertical-align: top;
         word-break: break-word;
-        max-width: 1px;
+        background: white;
       }
-      .print-table ul {
-        margin: 0 !important;
-        padding: 0 !important;
+      .print-table .roi-value.positive {
+        background: #d4edda !important;
+        color: #155724 !important;
       }
-      .print-table table {
-        font-size: 9px !important;
+      .print-table .roi-value.negative {
+        background: #f8d7da !important;
+        color: #721c24 !important;
       }
-      h2, .print-table th {
-        font-size: 11px !important;
-        margin: 0 !important;
-        padding: 2px 0 !important;
+      .print-table .irr-value.positive {
+        background: #d1ecf1 !important;
+        color: #0c5460 !important;
       }
-      tr, td, th {
-        page-break-inside: avoid !important;
+      .print-table .irr-value.negative {
+        background: #f8d7da !important;
+        color: #721c24 !important;
+      }
+      .print-page-spacer {
+        display: block;
+        height: 120px;
+      }
+      .print-investment-section {
+        margin-top: 36px;
+      }
+      .print-investment-header {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 16px 16px 0 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+        margin-top: 0;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        text-align: center;
       }
     }
     .print-btn {
@@ -945,19 +1040,24 @@
         </div>
       </div>
       <!-- Printable Summary Section -->
-      <div class="print-summary" id="print-summary" style="display:none;">
-        <h2 style="font-size:1.1rem;margin-bottom:8px;">StockVUE ROI Calculator - Summary</h2>
-        <table class="print-table" style="width:100%;">
-          <thead>
-            <tr>
-              <th>Inputs</th>
-              <th>Costs</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Filled by JS -->
-          </tbody>
-        </table>
+      <div id="print-summary" style="display:none;">
+        <!-- Page 1: Inputs -->
+        <div class="print-page print-inputs">
+          <h2 style="font-size:1.1rem;margin-bottom:8px;">StockVUE ROI Calculator - Inputs</h2>
+          <table class="print-table" id="print-inputs-table" style="width:100%;"></table>
+          <div class="print-investment-section">
+            <div class="print-investment-header">StockVUE Investment</div>
+            <div class="print-breakdown-cards" id="print-investment-cards"></div>
+          </div>
+        </div>
+        <div class="print-page-spacer"></div>
+        <!-- Page 2: Cost Breakdown & 5-Year Projection -->
+        <div class="print-page print-costs">
+          <h2 style="font-size:1.1rem;margin-bottom:8px;">Cost Breakdown</h2>
+          <div class="print-breakdown-cards" id="print-breakdown-cards"></div>
+          <h2 style="font-size:1.1rem;margin:24px 0 8px 0;">5-Year Projection</h2>
+          <div id="print-projection-table"></div>
+        </div>
       </div>
       <button class="print-btn" onclick="showPrintSummary()">Print Summary</button>
     </div>
@@ -1282,7 +1382,7 @@
 
     // Printable summary logic
     function showPrintSummary() {
-      // Gather all relevant data
+      // Page 1: Inputs
       const inputs = [
         { label: "Inventory Count", value: document.getElementById('inv_count').value },
         { label: "Cost per Piece", value: document.getElementById('cost_per_piece').value },
@@ -1297,81 +1397,107 @@
         { label: "Loss per Stockout", value: document.getElementById('loss_per_stockout').value },
         { label: "Stockout Reduction", value: document.getElementById('reduction_stockouts').value }
       ];
-      const costs = [
-        { label: "Small Scales", value: document.getElementById('small_scale_count').value },
-        { label: "Medium Scales", value: document.getElementById('med_scale_count').value },
-        { label: "Large Scales", value: document.getElementById('large_scale_count').value },
-        { label: "Router Unit Cost", value: document.getElementById('cost_router').value },
-        { label: "Other Cost", value: document.getElementById('other_cost').value },
-        { label: "Small Scales Cost", value: document.getElementById('small_scales_cost').innerText },
-        { label: "Medium Scales Cost", value: document.getElementById('med_scales_cost').innerText },
-        { label: "Large Scales Cost", value: document.getElementById('large_scales_cost').innerText },
-        { label: "Routers Cost", value: document.getElementById('routers_cost').innerText },
-        { label: "Total Hardware", value: document.getElementById('total_hardware_cost').innerText },
-        { label: "Base License (Annual)", value: document.getElementById('base_license_cost').innerText },
-        { label: "Total Software", value: document.getElementById('total_software_cost').innerText },
-        { label: "Other Costs", value: document.getElementById('other_costs_display').innerText }
+      let inputsTable = '<tbody>';
+      for (let i = 0; i < inputs.length; i += 2) {
+        inputsTable += '<tr>' +
+          `<td><strong>${inputs[i].label}:</strong> ${inputs[i].value}</td>` +
+          (inputs[i+1] ? `<td><strong>${inputs[i+1].label}:</strong> ${inputs[i+1].value}</td>` : '<td></td>') +
+          '</tr>';
+      }
+      inputsTable += '</tbody>';
+      document.getElementById('print-inputs-table').innerHTML = inputsTable;
+
+      // StockVUE Investment Section
+      const investmentCards = [
+        {
+          title: 'StockVUE Hardware Cost',
+          items: [
+            { label: 'Number of Small Scales', value: document.getElementById('small_scale_count').value },
+            { label: 'Number of Medium Scales', value: document.getElementById('med_scale_count').value },
+            { label: 'Number of Large Scales', value: document.getElementById('large_scale_count').value },
+            { label: 'Estimated Router unit cost', value: document.getElementById('cost_router').value }
+          ]
+        },
+        {
+          title: 'StockVUE Software Costs',
+          items: [
+            { label: 'Number of Scales', value: document.getElementById('software_scale_count').value },
+            { label: 'Base Software Support License (monthly)', value: document.getElementById('software_base_cost').value }
+          ]
+        },
+        {
+          title: 'StockVUE Other Costs',
+          items: [
+            { label: 'Installation & Miscellaneous (first year)', value: document.getElementById('other_cost').value }
+          ]
+        }
       ];
-      const results = [
-        { label: "Annual Savings", value: document.getElementById('total_savings').innerText },
-        { label: "Initial Investment", value: document.getElementById('total_cost').innerText }
+      let investmentHTML = '';
+      investmentCards.forEach((card, idx) => {
+        let borderColor = '#e1e8ed';
+        if (idx === 0) borderColor = '#3498db';
+        if (idx === 1) borderColor = '#e74c3c';
+        if (idx === 2) borderColor = '#f39c12';
+        investmentHTML += `<div style="border-top:6px solid ${borderColor}"><div style='font-weight:600;font-size:1.05em;margin-bottom:8px;'>${card.title}</div>`;
+        card.items.forEach(item => {
+          investmentHTML += `<div style='display:flex;justify-content:space-between;margin-bottom:4px;'><span>${item.label}:</span><span>${item.value}</span></div>`;
+        });
+        investmentHTML += '</div>';
+      });
+      document.getElementById('print-investment-cards').innerHTML = investmentHTML;
+
+      // Page 2: Cost Breakdown
+      const breakdownCards = [
+        {
+          title: 'Hardware Costs',
+          items: [
+            { label: 'Small Scales', value: document.getElementById('small_scales_cost').innerText },
+            { label: 'Medium Scales', value: document.getElementById('med_scales_cost').innerText },
+            { label: 'Large Scales', value: document.getElementById('large_scales_cost').innerText },
+            { label: 'Routers', value: document.getElementById('routers_cost').innerText }
+          ],
+          total: { label: 'Total Hardware', value: document.getElementById('total_hardware_cost').innerText }
+        },
+        {
+          title: 'Software Costs',
+          items: [
+            { label: 'Base Software Support License (Annual)', value: document.getElementById('base_license_cost').innerText }
+          ],
+          total: { label: 'Total Software', value: document.getElementById('total_software_cost').innerText }
+        },
+        {
+          title: 'Other Costs',
+          items: [
+            { label: 'Installation & Misc', value: document.getElementById('other_costs_display').innerText }
+          ],
+          total: { label: 'Total Other', value: document.getElementById('total_other_cost').innerText }
+        }
       ];
+      let breakdownHTML = '';
+      breakdownCards.forEach(card => {
+        breakdownHTML += `<div><div style='font-weight:600;font-size:1.05em;margin-bottom:8px;'>${card.title}</div>`;
+        card.items.forEach(item => {
+          breakdownHTML += `<div style='display:flex;justify-content:space-between;margin-bottom:4px;'><span>${item.label}:</span><span>${item.value}</span></div>`;
+        });
+        breakdownHTML += `<div style='display:flex;justify-content:space-between;margin-top:10px;font-weight:700;'><span>${card.total.label}:</span><span>${card.total.value}</span></div>`;
+        breakdownHTML += '</div>';
+      });
+      document.getElementById('print-breakdown-cards').innerHTML = breakdownHTML;
 
       // 5-Year Projection Table
-      const projRows = Array.from(document.querySelectorAll('#projection-table tbody tr'));
-      let projectionHTML = '<table style="width:100%;font-size:11px;border-collapse:collapse;">';
-      projectionHTML += document.querySelector('#projection-table thead').outerHTML;
-      projectionHTML += '<tbody>';
-      projRows.forEach(row => {
-        projectionHTML += `<tr>${row.innerHTML}</tr>`;
+      const projTable = document.getElementById('projection-table');
+      let projHTML = '<table class="print-table">';
+      projHTML += projTable.querySelector('thead').outerHTML;
+      projHTML += '<tbody>';
+      Array.from(projTable.querySelectorAll('tbody tr')).forEach(row => {
+        projHTML += `<tr>${row.innerHTML}</tr>`;
       });
-      projectionHTML += '</tbody></table>';
+      projHTML += '</tbody></table>';
+      document.getElementById('print-projection-table').innerHTML = projHTML;
 
-      // Build HTML
-      let html = `
-        <tr>
-          <td style="vertical-align:top;width:50%;">
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">
-              ${inputs.map(i => `<li><strong>${i.label}:</strong> ${i.value}</li>`).join('')}
-            </ul>
-          </td>
-          <td style="vertical-align:top;width:50%;">
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">
-              ${costs.map(i => `<li><strong>${i.label}:</strong> ${i.value}</li>`).join('')}
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" style="padding-top:8px;">
-            <div style="font-size:13px;text-align:center;">
-              <strong>Results:</strong>
-              ${results.map(r => `<span style="margin-right:20px;"><strong>${r.label}:</strong> ${r.value}</span>`).join('')}
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" style="padding-top:8px;">
-            <div style="font-size:13px;text-align:center;">
-              <strong>5-Year Projection:</strong>
-              ${projectionHTML}
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" style="padding-top:8px;">
-            <div style="margin:12px auto 0 auto;padding:10px 16px;background:#fff3cd;border:1px solid #ffeeba;border-radius:8px;color:#856404;font-size:12px;text-align:center;max-width:600px;">
-              This estimate does not serve as a quote, please contact us for an accurate estimate for your needs.
-            </div>
-          </td>
-        </tr>
-      `;
-
-      document.querySelector('#print-summary .print-table tbody').innerHTML = html;
+      // Show print summary and print
       document.getElementById('print-summary').style.display = 'block';
-
       window.print();
-
-      // Hide after print
       setTimeout(() => {
         document.getElementById('print-summary').style.display = 'none';
       }, 1000);
@@ -1397,7 +1523,7 @@
       document.getElementById('zoho-lead-iframe').addEventListener('load', function() {
         setTimeout(function() {
           document.getElementById('after-lead-submit').style.display = 'block';
-        }, 10000); // Changed from 5000 to 10000 (10 seconds)
+        }, 500); // Changed from 5000 to 10000 (10 seconds)
       });
       window.afterLeadContinue = function() {
         window.closeLeadCaptureModal();
