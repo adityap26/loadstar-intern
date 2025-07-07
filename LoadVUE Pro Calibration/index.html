@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -227,6 +226,31 @@
     width: 100%;
     height: 100%;
 }
+#calibration-table th, #calibration-table td {
+    padding: 2px 2px !important;
+    font-size: 15px;
+    text-align: center;
+}
+#calibration-table input[type=number] {
+    width: 80px;
+    height: 22px;
+    font-size: 14px;
+    padding: 2px 4px;
+    margin: 0;
+    text-align: right;
+}
+#calibration-table button {
+    color: white;
+    width: 48px;
+    height: 22px;
+    font-size: 13px;
+    padding: 0 4px;
+    margin: 0;
+}
+#calibration-table {
+    margin-left: 0;
+    table-layout: fixed;
+}
 </style>
 </head>
 <body>
@@ -326,6 +350,45 @@
     <div id="right-section3" class="horizontal-align">
         <button onclick="saveData()" style="color:white; width: 100%; height: 25px;">Save Data</button>
     </div>
+</div>
+
+<div id="footer" style="background-color: #B2E4FF; text-align: center; padding: 5px; margin-top: 10px;">
+Loadstar Sensors Copyright 2025 All Rights Reserved.
+</div>
+
+<!-- Multi-Point Calibration Table -->
+<div style="margin-top: 30px; width: 75%; margin-left: 0;">
+  <h2 style="margin-bottom: 10px;">Multi-Point Calibration</h2>
+  <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th style="width: 60px; padding: 4px 2px; text-align: center;">Point No.</th>
+        <th style="width: 120px; padding: 4px 2px; text-align: center;">Known Weight</th>
+        <th style="width: 120px; padding: 4px 2px; text-align: center;">Raw Sensor Value</th>
+        <th style="width: 70px; padding: 4px 2px; text-align: center;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 10 rows for calibration points -->
+      <script>
+        for (let i = 1; i <= 10; i++) {
+          document.write(`
+            <tr>
+              <td style='text-align:center; padding: 2px 2px; font-size: 15px;'>${i}</td>
+              <td style='padding: 2px 2px; text-align: center;'><input type='number' id='calib-weight-${i}' style='width:80px; height: 22px; font-size: 14px; padding: 2px 4px; margin: 0; text-align: right;' placeholder='Enter weight'></td>
+              <td id='calib-raw-${i}' style='text-align:center; padding: 2px 2px; font-size: 15px;'>---</td>
+              <td style='text-align:center; padding: 2px 2px;'><button onclick='readCalibrationRaw(${i})' style='color:white; width: 48px; height: 22px; font-size: 13px; padding: 0 4px; margin: 0;'>Read</button></td>
+            </tr>
+          `);
+        }
+      </script>
+    </tbody>
+  </table>
+  <div style="margin-top: 10px; display: flex; gap: 10px;">
+    <button onclick="calculateCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Calculate Calibration</button>
+    <button onclick="burnCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Burn Calibration</button>
+  </div>
+  <div id="calibration-result" style="margin-top: 8px; font-size: 15px;"></div>
 </div>
 
 <script>
@@ -709,21 +772,26 @@ function stopReading() {
         }
         document.getElementById("stop").style.display = "block";
         document.getElementById("read").style.display = "none";
-        // document.getElementById("averageReading").style.display = "none";
         isStart = true;
         let sum =0, avg=0,isPush=false, counter=0;
-        console.log('avg reading count:',avgCount);
         readingInterval = setInterval(async () => {
-            const sensorData = await fetchSensorData();
-            const convertedData = convertUnits(sensorData/1000);
-            if(counter<avgCount)
-            {
+            const rawValue = await fetchRawSensorValue();
+            let slope = window._calibSlope;
+            let intercept = window._calibIntercept;
+            let displayValue, convertedData;
+            if (typeof slope === 'number' && typeof intercept === 'number' && !isNaN(slope) && !isNaN(intercept) && slope !== 0) {
+                const weight = (parseFloat(rawValue) - intercept) / slope;
+                convertedData = weight;
+                displayValue = `${weight.toFixed(currentResolution)} ${_currentUnit}`;
+            } else {
+                convertedData = parseFloat(rawValue);
+                displayValue = `${rawValue} (raw)`;
+            }
+            if(counter<avgCount) {
                 isPush = false;
                 sum+=parseFloat(convertedData);
                 counter++;
-            }
-            else
-            {
+            } else {
                 avg = sum/avgCount;
                 sum=0;
                 counter=0;
@@ -732,34 +800,25 @@ function stopReading() {
             const _convertedData = avg.toFixed(currentResolution);
             const now = new Date().toLocaleTimeString();
             if(isPush){
-                document.getElementById("outputReading").textContent = `${_convertedData} ${_currentUnit}`;
-
-            // Update chart data arrays
-            chartData.push(_convertedData);
-            chartLabels.push(now);
-
-            // Add the data to the table
-            addToTable(now, `${_convertedData}`);
-
-            // Update the chart based on the current mode
-            if (chartMode === 'cumulative') {
-                showCumulativeGraph();
-            } else if (chartMode === 'recent') {
-                showRecentGraph();
+                document.getElementById("outputReading").textContent = displayValue;
+                chartData.push(_convertedData);
+                chartLabels.push(now);
+                addToTable(now, `${_convertedData}`);
+                if (chartMode === 'cumulative') {
+                    showCumulativeGraph();
+                } else if (chartMode === 'recent') {
+                    showRecentGraph();
+                }
+                if (convertedData > peakValue) {
+                    peakValue = _convertedData;
+                    document.getElementById("peak-value").textContent = `${peakValue}`;
+                }
+                if (convertedData < lowValue) {
+                    lowValue = _convertedData;
+                    document.getElementById("low-value").textContent = `${lowValue}`;
+                }
             }
-
-            // Update peak and low values
-        if (convertedData > peakValue) {
-            peakValue = _convertedData;
-            document.getElementById("peak-value").textContent = `${peakValue}`;
-        }
-        if (convertedData < lowValue) {
-            lowValue = _convertedData;
-            document.getElementById("low-value").textContent = `${lowValue}`;
-        }
-            }
-            
-        }, 100);  // Update reading every 1000 ms (1 second)
+        }, 100);
     }
 
     async function tare() {
@@ -1018,8 +1077,233 @@ function clearTable() {
     return tableHead;
   }
 </script>
-<div id="footer" style="background-color: #B2E4FF; text-align: center; padding: 5px; margin-top: 10px;">
-Loadstar Sensors Copyright 2025 All Rights Reserved.
-</div>
+
+<script>
+// Store calibration data
+let calibrationPoints = Array(10).fill({ weight: null, raw: null });
+
+async function fetchRawSensorValue() {
+  // Sends 'R\r' to get the raw ADC value from the sensor
+  const command = 'R\r';
+  try {
+    await writer.write(command);
+    const decoder = new TextDecoder();
+    let result = '';
+    while (true) {
+      const { value, done } = await globalReader.read();
+      if (done) break;
+      result += decoder.decode(value);
+      if (result.includes('\n')) break;
+    }
+    // Extract the first number from the result
+    const match = result.match(/-?\d+(?:\.\d+)?/);
+    return match ? match[0] : result.trim();
+  } catch (error) {
+    console.error('Error reading raw ADC value:', error);
+    return 'Error';
+  }
+}
+
+async function readCalibrationRaw(idx) {
+  // Get the raw sensor value for the current weight
+  const weightInput = document.getElementById(`calib-weight-${idx}`);
+  const weight = parseFloat(weightInput.value);
+  if (isNaN(weight)) {
+    alert('Please enter a known weight before reading.');
+    return;
+  }
+  // Fetch raw sensor value using the correct command
+  const rawValue = await fetchRawSensorValue();
+  document.getElementById(`calib-raw-${idx}`).textContent = rawValue;
+  calibrationPoints[idx - 1] = { weight, raw: parseFloat(rawValue) };
+}
+
+function calculateCalibration() {
+  // Gather all valid points
+  const points = calibrationPoints.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+  if (points.length < 2) {
+    document.getElementById('calibration-result').textContent = 'At least 2 points are required for calibration.';
+    return;
+  }
+  // Linear regression (raw = slope * weight + intercept)
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, n = points.length;
+  for (const pt of points) {
+    sumX += pt.weight;
+    sumY += pt.raw;
+    sumXY += pt.weight * pt.raw;
+    sumXX += pt.weight * pt.weight;
+  }
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+  let resultText = `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}`;
+  // Store for burning
+  window._calibSlope = slope;
+  window._calibIntercept = intercept;
+
+  // If at least 4 points, also show cubic fit
+  if (points.length >= 4) {
+    const x = points.map(pt => pt.weight);
+    const y = points.map(pt => pt.raw);
+    function cubicFit(x, y) {
+      const n = x.length;
+      let sumX = 0, sumX2 = 0, sumX3 = 0, sumX4 = 0, sumX5 = 0, sumX6 = 0;
+      let sumY = 0, sumXY = 0, sumX2Y = 0, sumX3Y = 0;
+      for (let i = 0; i < n; i++) {
+        const xi = x[i], yi = y[i];
+        const xi2 = xi * xi, xi3 = xi2 * xi, xi4 = xi3 * xi, xi5 = xi4 * xi, xi6 = xi5 * xi;
+        sumX += xi;
+        sumX2 += xi2;
+        sumX3 += xi3;
+        sumX4 += xi4;
+        sumX5 += xi5;
+        sumX6 += xi6;
+        sumY += yi;
+        sumXY += xi * yi;
+        sumX2Y += xi2 * yi;
+        sumX3Y += xi3 * yi;
+      }
+      const A = [
+        [sumX6, sumX5, sumX4, sumX3],
+        [sumX5, sumX4, sumX3, sumX2],
+        [sumX4, sumX3, sumX2, sumX],
+        [sumX3, sumX2, sumX, n]
+      ];
+      const B = [sumX3Y, sumX2Y, sumXY, sumY];
+      function gauss(A, B) {
+        const n = B.length;
+        for (let i = 0; i < n; i++) {
+          let maxRow = i;
+          for (let k = i + 1; k < n; k++) {
+            if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) maxRow = k;
+          }
+          [A[i], A[maxRow]] = [A[maxRow], A[i]];
+          [B[i], B[maxRow]] = [B[maxRow], B[i]];
+          for (let k = i + 1; k < n; k++) {
+            const c = A[k][i] / A[i][i];
+            for (let j = i; j < n; j++) A[k][j] -= c * A[i][j];
+            B[k] -= c * B[i];
+          }
+        }
+        const x = Array(n).fill(0);
+        for (let i = n - 1; i >= 0; i--) {
+          x[i] = B[i];
+          for (let j = i + 1; j < n; j++) x[i] -= A[i][j] * x[j];
+          x[i] /= A[i][i];
+        }
+        return x;
+      }
+      return gauss(A, B); // [a, b, c, d]
+    }
+    const [CCA, CCB, CCC, CCD] = cubicFit(x, y);
+    resultText += `\nCubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})`;
+  }
+  document.getElementById('calibration-result').textContent = resultText;
+}
+
+async function burnCalibration() {
+  // Gather all valid points
+  const validPoints = calibrationPoints.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+  if (validPoints.length < 4) {
+    alert('At least 4 calibration points are required for cubic calibration.');
+    return;
+  }
+  // Prepare arrays for cubic fit
+  const x = validPoints.map(pt => pt.weight);
+  const y = validPoints.map(pt => pt.raw);
+
+  // Cubic fit using least squares (returns [a, b, c, d] for ax^3 + bx^2 + cx + d)
+  function cubicFit(x, y) {
+    const n = x.length;
+    let sumX = 0, sumX2 = 0, sumX3 = 0, sumX4 = 0, sumX5 = 0, sumX6 = 0;
+    let sumY = 0, sumXY = 0, sumX2Y = 0, sumX3Y = 0;
+    for (let i = 0; i < n; i++) {
+      const xi = x[i], yi = y[i];
+      const xi2 = xi * xi, xi3 = xi2 * xi, xi4 = xi3 * xi, xi5 = xi4 * xi, xi6 = xi5 * xi;
+      sumX += xi;
+      sumX2 += xi2;
+      sumX3 += xi3;
+      sumX4 += xi4;
+      sumX5 += xi5;
+      sumX6 += xi6;
+      sumY += yi;
+      sumXY += xi * yi;
+      sumX2Y += xi2 * yi;
+      sumX3Y += xi3 * yi;
+    }
+    // Solve the normal equations for cubic fit
+    // [ [Sx6 Sx5 Sx4 Sx3]   [a]   [Sx3y]
+    //   [Sx5 Sx4 Sx3 Sx2] * [b] = [Sx2y]
+    //   [Sx4 Sx3 Sx2 Sx1]   [c]   [Sxy ]
+    //   [Sx3 Sx2 Sx1 n  ]   [d]   [Sy  ] ]
+    const A = [
+      [sumX6, sumX5, sumX4, sumX3],
+      [sumX5, sumX4, sumX3, sumX2],
+      [sumX4, sumX3, sumX2, sumX],
+      [sumX3, sumX2, sumX, n]
+    ];
+    const B = [sumX3Y, sumX2Y, sumXY, sumY];
+    // Gaussian elimination
+    function gauss(A, B) {
+      const n = B.length;
+      for (let i = 0; i < n; i++) {
+        // Partial pivot
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) maxRow = k;
+        }
+        [A[i], A[maxRow]] = [A[maxRow], A[i]];
+        [B[i], B[maxRow]] = [B[maxRow], B[i]];
+        // Eliminate
+        for (let k = i + 1; k < n; k++) {
+          const c = A[k][i] / A[i][i];
+          for (let j = i; j < n; j++) A[k][j] -= c * A[i][j];
+          B[k] -= c * B[i];
+        }
+      }
+      // Back substitution
+      const x = Array(n).fill(0);
+      for (let i = n - 1; i >= 0; i--) {
+        x[i] = B[i];
+        for (let j = i + 1; j < n; j++) x[i] -= A[i][j] * x[j];
+        x[i] /= A[i][i];
+      }
+      return x;
+    }
+    return gauss(A, B); // [a, b, c, d]
+  }
+
+  // Fit cubic: raw = a*x^3 + b*x^2 + c*x + d
+  const [CCA, CCB, CCC, CCD] = cubicFit(x, y);
+  // Use the first raw value as FAZ (offset)
+  const FAZ = validPoints[0].raw;
+
+  // Show the cubic fit equation and coefficients
+  document.getElementById('calibration-result').textContent =
+    `Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})\nFAZ = ${FAZ}`;
+
+  // Send the coefficients to the sensor for universal calibration (compression)
+  try {
+    await writer.write(`ncal 2\r`); // Universal calibration mode
+    await delay(500);
+    await writer.write(`CCA ${CCA}\r`);
+    await delay(500);
+    await writer.write(`CCB ${CCB}\r`);
+    await delay(500);
+    await writer.write(`CCC ${CCC}\r`);
+    await delay(500);
+    await writer.write(`CCD ${CCD}\r`);
+    await delay(500);
+    await writer.write(`FAZ ${FAZ}\r`);
+    await delay(500);
+    alert('Cubic (curve fit) calibration burned successfully!');
+  } catch (e) {
+    alert('Failed to burn cubic calibration: ' + e);
+  }
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+</script>
 </body>
 </html>
