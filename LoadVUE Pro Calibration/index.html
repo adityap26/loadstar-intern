@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,6 @@
 <title>LoadVUE Pro Cloud</title>
 <meta name="Description" content="Set your baud speed and hit connect. A serial terminal that runs without any plugins in chrome.">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <style>
     * {
         background-color: #ECECEC;
@@ -648,27 +648,42 @@
     }
 
     async function fetchSensorData() {
-        const command = 'o0w1\r';
+        const command = 'o0w1\r';  // Command to request sensor data
         try {
+            console.log('Sending data request command:', command);
+
+            // Send the data command to the sensor
             await writer.write(command);
+            console.log('Command sent successfully.');
+
             const decoder = new TextDecoder();
-            let attempts = 0;
-            while (attempts < 10) {
-                let result = '';
-                while (true) {
-                    const { value, done } = await globalReader.read();
-                    if (done) break;
-                    result += decoder.decode(value);
-                    if (result.includes('\n')) break;
+            let result = '';
+            console.log('Reading data from sensor...');
+            
+            while (true) {
+                const { value, done } = await globalReader.read();
+                if (done) {
+                    console.log('No more data to read.');
+                    break;
                 }
-                const parsed = parseFloat(result.trim());
-                if (!isNaN(parsed)) return parsed;
-                attempts++;
-                await new Promise(res => setTimeout(res, 50));
+
+                // Append the received value to the result
+                result += decoder.decode(value);
+                console.log('Received chunk:', value);
+                console.log('Decoded chunk:', decoder.decode(value));
+                
+                // Break early if we expect the data to end with a specific character
+                if (result.includes('\n')) {
+                    console.log('End of data detected.');
+                    break;
+                }
             }
-            return 0;
+
+            console.log('Final received data:', result);
+            return parseFloat(result.trim()).toFixed(2);
         } catch (error) {
-            return 0;
+            console.error('Error reading data:', error);
+            return "Error retrieving data";
         }
     }
 
@@ -690,52 +705,61 @@ function stopReading() {
     let avgCount = 1;
     async function showReading() {
         if (readingInterval) {
-            clearInterval(readingInterval);
+            clearInterval(readingInterval);  // Clear any existing interval
         }
         document.getElementById("stop").style.display = "block";
         document.getElementById("read").style.display = "none";
+        // document.getElementById("averageReading").style.display = "none";
         isStart = true;
         let sum =0, avg=0,isPush=false, counter=0;
+        console.log('avg reading count:',avgCount);
         readingInterval = setInterval(async () => {
-            let raw = await fetchSensorData();
-            if (isNaN(raw)) return; // Skip if not a number
-            let convertedData = raw/1000;
-            if (window.lastFit && !isNaN(window.lastFit.m) && !isNaN(window.lastFit.b)) {
-                convertedData = window.lastFit.m * raw + window.lastFit.b;
-            }
-            convertedData = Number(convertedData);
-            if(counter<avgCount) {
+            const sensorData = await fetchSensorData();
+            const convertedData = convertUnits(sensorData/1000);
+            if(counter<avgCount)
+            {
                 isPush = false;
-                sum+=convertedData;
+                sum+=parseFloat(convertedData);
                 counter++;
-            } else {
+            }
+            else
+            {
                 avg = sum/avgCount;
                 sum=0;
                 counter=0;
                 isPush=true;
             }
-            const _convertedData = isNaN(avg) ? '' : avg.toFixed(currentResolution);
+            const _convertedData = avg.toFixed(currentResolution);
             const now = new Date().toLocaleTimeString();
-            if(isPush && !isNaN(avg)){
+            if(isPush){
                 document.getElementById("outputReading").textContent = `${_convertedData} ${_currentUnit}`;
-                chartData.push(_convertedData);
-                chartLabels.push(now);
-                addToTable(now, `${_convertedData}`);
-                if (chartMode === 'cumulative') {
-                    showCumulativeGraph();
-                } else if (chartMode === 'recent') {
-                    showRecentGraph();
-                }
-                if (convertedData > peakValue) {
-                    peakValue = _convertedData;
-                    document.getElementById("peak-value").textContent = `${peakValue}`;
-                }
-                if (convertedData < lowValue) {
-                    lowValue = _convertedData;
-                    document.getElementById("low-value").textContent = `${lowValue}`;
-                }
+
+            // Update chart data arrays
+            chartData.push(_convertedData);
+            chartLabels.push(now);
+
+            // Add the data to the table
+            addToTable(now, `${_convertedData}`);
+
+            // Update the chart based on the current mode
+            if (chartMode === 'cumulative') {
+                showCumulativeGraph();
+            } else if (chartMode === 'recent') {
+                showRecentGraph();
             }
-        }, 100);
+
+            // Update peak and low values
+        if (convertedData > peakValue) {
+            peakValue = _convertedData;
+            document.getElementById("peak-value").textContent = `${peakValue}`;
+        }
+        if (convertedData < lowValue) {
+            lowValue = _convertedData;
+            document.getElementById("low-value").textContent = `${lowValue}`;
+        }
+            }
+            
+        }, 100);  // Update reading every 1000 ms (1 second)
     }
 
     async function tare() {
@@ -811,33 +835,33 @@ function clearTable() {
 }
     // Function to add a row to the table
     function addToTable(time, reading) {
-        if (isNaN(Number(reading))) return; // Skip NaN readings
         const tableBody = document.querySelector("#data-table tbody");
         const newRow = document.createElement("tr");
 
         const timeCell = document.createElement("td");
         timeCell.textContent = time;
-        timeCell.style.backgroundColor = "#000000";
-        timeCell.style.color = "#ffffff";
+        timeCell.style.backgroundColor = "#000000"; // Set background color to black
+        timeCell.style.color = "#ffffff"; // Set text color to white
         newRow.appendChild(timeCell);
 
         const readingCell = document.createElement("td");
         readingCell.textContent = reading;
-        readingCell.style.backgroundColor = "#000000";
-        readingCell.style.color = "#ffffff";
+        readingCell.style.backgroundColor = "#000000"; // Set background color to black
+        readingCell.style.color = "#ffffff"; // Set text color to white
         newRow.appendChild(readingCell);
 
-        const peakCell = document.createElement("td");
-        peakCell.textContent = `${peakValue}`;
-        peakCell.style.backgroundColor = "#000000";
-        peakCell.style.color = "#ffffff";
-        newRow.appendChild(peakCell);
 
-        const lowCell = document.createElement("td");
-        lowCell.textContent = `${lowValue}`;
-        lowCell.style.backgroundColor = "#000000";
-        lowCell.style.color = "#ffffff";
-        newRow.appendChild(lowCell);
+    const peakCell = document.createElement("td");
+    peakCell.textContent = `${peakValue}`; // Display the current peak value
+    peakCell.style.backgroundColor = "#000000"; // Set background color to black
+    peakCell.style.color = "#ffffff"; // Set text color to white
+    newRow.appendChild(peakCell);
+
+    const lowCell = document.createElement("td");
+    lowCell.textContent = `${lowValue}`; // Display the current low value
+    lowCell.style.backgroundColor = "#000000"; // Set background color to black
+    lowCell.style.color = "#ffffff"; // Set text color to white
+    newRow.appendChild(lowCell);
 
         tableBody.prepend(newRow);
     }
@@ -911,9 +935,9 @@ function clearTable() {
             },
             options: {
                 scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                    xAxes: [{
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.1)' // Lighter grid lines for better visibility
                         },
                         type: 'time',
                         time: {
@@ -922,12 +946,12 @@ function clearTable() {
                                 second: 'h:mm:ss a'
                             }
                         }
-                    },
-                    y: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.1)' // Lighter grid lines for better visibility
                         }
-                    }
+                    }]
                 },
                 elements: {
                     line: {
@@ -994,173 +1018,8 @@ function clearTable() {
     return tableHead;
   }
 </script>
-<!-- ─── Multi-Point Calibration Section ─── -->
-<div style="margin:20px 0; padding:10px; border:1px solid #CCC; background:#FFF;">
-    <h3>Multi-Point Calibration</h3>
-    <table id="calTable" style="width:100%; border-collapse:collapse; margin-bottom:10px;">
-      <thead>
-        <tr>
-          <th style="border:1px solid #AAA; padding:4px;">Point</th>
-          <th style="border:1px solid #AAA; padding:4px;">Applied Weight</th>
-          <th style="border:1px solid #AAA; padding:4px;">Raw Count</th>
-          <th style="border:1px solid #AAA; padding:4px;">Read</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- rows will be injected by script -->
-      </tbody>
-    </table>
-    <button id="computeFit" style="margin-right:10px;">Compute Fit</button>
-    <span id="fitResult">Slope: ―, Intercept: ―</span>
-    <button id="burnCal" style="float:right;">Burn Calibration</button>
-  </div>
-  
-  <script>
-    // ── Serial connection, Chart.js setup, saveData(), etc. (unchanged) ──
-
-    // Populate 10 calibration rows
-    const calTbody = document.querySelector('#calTable tbody');
-    for (let i = 1; i <= 10; i++) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="border:1px solid #AAA; padding:4px; text-align:center;">${i}</td>
-        <td style="border:1px solid #AAA; padding:4px;">
-          <input type="number" class="weight" style="width:100%;" placeholder="e.g. 0, 2, 4, 5">
-        </td>
-        <td style="border:1px solid #AAA; padding:4px;">
-          <input type="text" class="raw" readonly style="width:100%; background:#EEE;">
-        </td>
-        <td style="border:1px solid #AAA; padding:4px; text-align:center;">
-          <button class="readBtn">Read</button>
-        </td>`;
-      calTbody.appendChild(tr);
-    }
-
-    // Helper: grab one raw count from the scale
-    async function flushSerialBuffer() {
-      for (let i = 0; i < 5; i++) {
-        // Use Promise.race to timeout if no data is available
-        const result = await Promise.race([
-          globalReader.read(),
-          new Promise(resolve => setTimeout(() => resolve({ value: null, done: true }), 50))
-        ]);
-        if (!result.value || result.done) break;
-      }
-    }
-    async function readRawCount() {
-      try {
-        if (!globalReader || !writer) {
-          console.error("Serial connection not established.");
-          alert("Serial connection not established.");
-          return '';
-        }
-        console.log("[readRawCount] Flushing serial buffer...");
-        await flushSerialBuffer();
-        console.log("[readRawCount] Sending 'o0w1\\r' command...");
-        await writer.write('o0w1\r');
-        let attempts = 0;
-        while (attempts < 10) {
-          const { value } = await globalReader.read();
-          const raw = parseInt(new TextDecoder().decode(value).trim(), 10);
-          console.log(`[readRawCount] Attempt ${attempts + 1}: value=`, value, 'parsed raw=', raw);
-          if (!isNaN(raw)) return raw;
-          attempts++;
-          await new Promise(res => setTimeout(res, 50));
-        }
-        console.warn("[readRawCount] No valid raw value received after 10 attempts.");
-        return '';
-      } catch (e) {
-        console.error("[readRawCount] Error:", e);
-        alert("Error reading raw count: " + e);
-        return '';
-      }
-    }
-
-    // Wire up each "Read" button with retry and NaN guard
-    document.querySelectorAll('.readBtn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        console.log("[Calibration Read Button] Clicked");
-        btn.disabled = true;
-        try {
-          const raw = await readRawCount();
-          console.log("[Calibration Read Button] Setting raw value:", raw);
-          btn.closest('tr').querySelector('.raw').value = (!isNaN(raw)) ? raw : '';
-        } catch (e) {
-          console.error("[Calibration Read Button] Error:", e);
-          alert("Error: " + e);
-        }
-        btn.disabled = false;
-      });
-    });
-
-    // Least-squares fit
-    function fitLine(points) {
-      const n     = points.length;
-      const sumR  = points.reduce((s,p)=>s+p.R,0);
-      const sumW  = points.reduce((s,p)=>s+p.W,0);
-      const sumRW = points.reduce((s,p)=>s+p.R*p.W,0);
-      const sumRR = points.reduce((s,p)=>s+p.R*p.R,0);
-      const m = (n*sumRW - sumR*sumW) / (n*sumRR - sumR*sumR);
-      const b = (sumW - m*sumR) / n;
-      return { m, b };
-    }
-
-    let lastFit = null;
-
-    // Compute Fit
-    document.getElementById('computeFit').addEventListener('click', () => {
-      const pts = Array.from(document.querySelectorAll('#calTable tbody tr'))
-        .map(tr => ({
-          W: parseFloat(tr.querySelector('.weight').value),
-          R: parseInt(tr.querySelector('.raw').value, 10)
-        }))
-        .filter(p => !isNaN(p.W) && !isNaN(p.R));
-
-      if (pts.length < 2) {
-        return alert('Please read at least 2 points');
-      }
-      lastFit = fitLine(pts);
-      window.lastFit = lastFit; // Store globally for verify section
-      document.getElementById('fitResult').textContent =
-        `Slope: ${lastFit.m.toFixed(6)}, Intercept: ${lastFit.b.toFixed(4)}`;
-    });
-
-    // Burn Calibration
-    document.getElementById('burnCal').addEventListener('click', async () => {
-      if (!lastFit) {
-        return alert('Please click Compute Fit first');
-      }
-
-      // Determine full-scale weight (largest W) from user inputs
-      const pts = Array.from(document.querySelectorAll('#calTable tbody tr'))
-        .map(tr => ({
-          W: parseFloat(tr.querySelector('.weight').value),
-          R: parseInt(tr.querySelector('.raw').value, 10)
-        }))
-        .filter(p => !isNaN(p.W));
-
-      const spanPt = pts.reduce((a,b) => a.W > b.W ? a : b);
-      const W1 = spanPt.W;
-
-      // Predicted raw at zero and at span, per fitted line
-      const R0 = Math.round(-lastFit.b / lastFit.m);
-      const R1 = Math.round((W1 - lastFit.b) / lastFit.m);
-
-      // Convert slope to mV/V (device spec)
-      const mVperV = (W1 / (R1 - R0)) * 1000;
-
-      // Send the standard 2-point EEPROM commands
-      await writer.write(`2PCAL ${R0} ${R1}\r`);
-      await writer.write(`SETCAL ${mVperV.toFixed(4)}\r`);
-      await writer.write(`BURNCAL\r`);
-
-      alert('Multi-point calibration burned to device');
-    });
-  </script>
-
-  <!-- ──────────────────────────────────────── -->
-  
 <div id="footer" style="background-color: #B2E4FF; text-align: center; padding: 5px; margin-top: 10px;">
 Loadstar Sensors Copyright 2025 All Rights Reserved.
 </div>
-
+</body>
+</html>
