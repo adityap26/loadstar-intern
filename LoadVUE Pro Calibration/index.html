@@ -438,7 +438,7 @@
           </div>
         </div>
         <div style="width: 100%; display: flex; justify-content: center; margin-top: 18px;">
-          <button id="calib-plot-toggle" class="burn-btn" style="height: 56px; min-width: 160px; font-size: 24px; background: #007BC6; color: #fff; border-radius: 6px; border: none;">Resume</button>
+          <button id="calib-plot-toggle" class="burn-btn" style="height: 56px; min-width: 160px; font-size: 24px; background: #007BC6; color: #fff; border-radius: 6px; border: none;">Start</button>
           <button id="calib-plot-clear" class="burn-btn" style="height: 56px; min-width: 120px; font-size: 24px; background: #d9534f; color: #fff; border-radius: 6px; border: none; margin-left: 12px;">Clear</button>
         </div>
       </div>
@@ -895,7 +895,7 @@ function stopReading() {
     let avgCount = 1;
     async function showReading() {
         if (pollingMode === 'calibration') {
-            alert('Pause the calibration plot to resume main display reading.');
+            alert('Stop the calibration plot to resume main display reading.');
             return;
         }
         if (readingInterval) {
@@ -1725,7 +1725,7 @@ function startCalibRawPlot() {
   calibPlotRunning = true;
   pollingMode = 'calibration';
   stopMainDisplayPolling();
-  document.getElementById('calib-plot-toggle').textContent = 'Pause';
+  document.getElementById('calib-plot-toggle').textContent = 'Stop';
   calibRawInterval = setInterval(async () => {
     if (!calibPlotRunning) return;
     // Only fetch if main display is not polling
@@ -1801,7 +1801,7 @@ document.addEventListener('DOMContentLoaded', function() {
     else startCalibRawPlot(); // Only start polling when user presses Resume
   };
   // Set button to Resume by default
-  document.getElementById('calib-plot-toggle').textContent = 'Resume';
+  document.getElementById('calib-plot-toggle').textContent = 'Start';
   // Add Clear button handler
   document.getElementById('calib-plot-clear').onclick = function() {
     calibRawHistory = [];
