@@ -331,6 +331,7 @@
         <canvas id="dataChart" style="width: 100%; height: 100%;"></canvas>
     </div>  
     <div id="right-section2" class="horizontal-align">
+        <button id="calibration-btn" onclick="openCalibrationModal()" style="color:white; width: 100%; height: 25px; margin-bottom: 10px;">Calibration</button>
         <button onclick="showCumulativeGraph()" style="color:white; width: 100%; height: 25px;">Cumulative</button>
         <button onclick="showRecentGraph()" style="margin-top: 10px; color:white; width: 100%; height: 25px;">Strip Chart</button>
     </div>
@@ -356,39 +357,33 @@
 Loadstar Sensors Copyright 2025 All Rights Reserved.
 </div>
 
-<!-- Multi-Point Calibration Table -->
-<div style="margin-top: 30px; width: 75%; margin-left: 0;">
-  <h2 style="margin-bottom: 10px;">Multi-Point Calibration</h2>
-  <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
-    <thead>
-      <tr>
-        <th style="width: 60px; padding: 4px 2px; text-align: center;">Point No.</th>
-        <th style="width: 120px; padding: 4px 2px; text-align: center;">Known Weight</th>
-        <th style="width: 120px; padding: 4px 2px; text-align: center;">Raw Sensor Value</th>
-        <th style="width: 70px; padding: 4px 2px; text-align: center;">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- 10 rows for calibration points -->
-      <script>
-        for (let i = 1; i <= 10; i++) {
-          document.write(`
-            <tr>
-              <td style='text-align:center; padding: 2px 2px; font-size: 15px;'>${i}</td>
-              <td style='padding: 2px 2px; text-align: center;'><input type='number' id='calib-weight-${i}' style='width:80px; height: 22px; font-size: 14px; padding: 2px 4px; margin: 0; text-align: right;' placeholder='Enter weight'></td>
-              <td id='calib-raw-${i}' style='text-align:center; padding: 2px 2px; font-size: 15px;'>---</td>
-              <td style='text-align:center; padding: 2px 2px;'><button onclick='readCalibrationRaw(${i})' style='color:white; width: 48px; height: 22px; font-size: 13px; padding: 0 4px; margin: 0;'>Read</button></td>
-            </tr>
-          `);
-        }
-      </script>
-    </tbody>
-  </table>
-  <div style="margin-top: 10px; display: flex; gap: 10px;">
-    <button onclick="calculateCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Calculate Calibration</button>
-    <button onclick="burnCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Burn Calibration</button>
+<!-- Calibration Modal (hidden by default) -->
+<div id="calibration-modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
+  <div id="calibration-modal-content" style="background:#fff; padding:24px 18px 18px 18px; border-radius:8px; min-width:420px; max-width:90vw; max-height:90vh; overflow:auto; position:relative;">
+    <button onclick="closeCalibrationModal()" style="position:absolute; top:8px; right:12px; font-size:20px; background:none; color:#333; border:none; cursor:pointer;">&times;</button>
+    <div id="calibration-modal-body">
+      <h2 style="margin-bottom: 10px;">Multi-Point Calibration</h2>
+      <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
+        <thead>
+          <tr>
+            <th style="width: 60px; padding: 4px 2px; text-align: center;">Point No.</th>
+            <th style="width: 120px; padding: 4px 2px; text-align: center;">Known Weight</th>
+            <th style="width: 120px; padding: 4px 2px; text-align: center;">Raw Sensor Value</th>
+            <th style="width: 70px; padding: 4px 2px; text-align: center;">Action</th>
+            <th style="width: 40px; padding: 4px 2px; text-align: center;"></th>
+          </tr>
+        </thead>
+        <tbody id="calibration-table-body">
+          <!-- Dynamic rows will be rendered here -->
+        </tbody>
+      </table>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <button onclick="calculateCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Calculate Calibration</button>
+        <button onclick="burnCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Burn Calibration</button>
+      </div>
+      <div id="calibration-result" style="margin-top: 8px; font-size: 15px;"></div>
+    </div>
   </div>
-  <div id="calibration-result" style="margin-top: 8px; font-size: 15px;"></div>
 </div>
 
 <script>
@@ -398,8 +393,8 @@ Loadstar Sensors Copyright 2025 All Rights Reserved.
     const sensorData = [];
     const timestamps = [];
     let readingInterval = null;  // To manage the live reading update interval
-    let peakValue = -0.00;  // Initialize peak value
-    let lowValue = 0.00;  // Initialize low value
+    let peakValue = Number.NEGATIVE_INFINITY;  // Initialize as number
+    let lowValue = Number.POSITIVE_INFINITY;   // Initialize as number
 
     let currentUnit = "lb";  // Default unit
     let currentResolution = 2;  // Default resolution (x.xx)
@@ -809,13 +804,15 @@ function stopReading() {
                 } else if (chartMode === 'recent') {
                     showRecentGraph();
                 }
-                if (convertedData > peakValue) {
-                    peakValue = _convertedData;
-                    document.getElementById("peak-value").textContent = `${peakValue}`;
+                // Ensure peakValue and lowValue are numbers
+                if (typeof convertedData === 'string') convertedData = parseFloat(convertedData);
+                if (convertedData > peakValue || !isFinite(peakValue)) {
+                    peakValue = convertedData;
+                    document.getElementById("peak-value").textContent = isFinite(peakValue) ? peakValue.toFixed(currentResolution) : "N/A";
                 }
-                if (convertedData < lowValue) {
-                    lowValue = _convertedData;
-                    document.getElementById("low-value").textContent = `${lowValue}`;
+                if (convertedData < lowValue || !isFinite(lowValue)) {
+                    lowValue = convertedData;
+                    document.getElementById("low-value").textContent = isFinite(lowValue) ? lowValue.toFixed(currentResolution) : "N/A";
                 }
             }
         }, 100);
@@ -833,8 +830,8 @@ function stopReading() {
         document.getElementById("outputReading").textContent = `0.00 ${_currentUnit}`;
 
         // Reset peak and low values to N/A
-        peakValue = -Infinity;
-        lowValue = Infinity;
+        peakValue = Number.NEGATIVE_INFINITY;
+        lowValue = Number.POSITIVE_INFINITY;
         document.getElementById("peak-value").textContent = `N/A`;
         document.getElementById("low-value").textContent = `N/A`;
         await tareCmd();
@@ -911,13 +908,13 @@ function clearTable() {
 
 
     const peakCell = document.createElement("td");
-    peakCell.textContent = `${peakValue}`; // Display the current peak value
+    peakCell.textContent = isFinite(peakValue) ? peakValue.toFixed(currentResolution) : "N/A"; // Display the current peak value
     peakCell.style.backgroundColor = "#000000"; // Set background color to black
     peakCell.style.color = "#ffffff"; // Set text color to white
     newRow.appendChild(peakCell);
 
     const lowCell = document.createElement("td");
-    lowCell.textContent = `${lowValue}`; // Display the current low value
+    lowCell.textContent = isFinite(lowValue) ? lowValue.toFixed(currentResolution) : "N/A"; // Display the current low value
     lowCell.style.backgroundColor = "#000000"; // Set background color to black
     lowCell.style.color = "#ffffff"; // Set text color to white
     newRow.appendChild(lowCell);
@@ -1079,43 +1076,139 @@ function clearTable() {
 </script>
 
 <script>
-// Store calibration data
-let calibrationPoints = Array(10).fill({ weight: null, raw: null });
+// Store calibration data dynamically
+let calibrationPoints = [];
+const MIN_CALIB_ROWS = 1;
+const DEFAULT_CALIB_ROWS = 9;
 
-async function fetchRawSensorValue() {
-  // Sends 'R\r' to get the raw ADC value from the sensor
-  const command = 'R\r';
-  try {
-    await writer.write(command);
-    const decoder = new TextDecoder();
-    let result = '';
-    while (true) {
-      const { value, done } = await globalReader.read();
-      if (done) break;
-      result += decoder.decode(value);
-      if (result.includes('\n')) break;
+function renderCalibrationTable() {
+  const tbody = document.getElementById('calibration-table-body');
+  tbody.innerHTML = '';
+  calibrationPoints.forEach((pt, idx) => {
+    const tr = document.createElement('tr');
+    // Point No.
+    const tdNo = document.createElement('td');
+    tdNo.style.textAlign = 'center';
+    tdNo.style.padding = '2px 2px';
+    tdNo.style.fontSize = '15px';
+    tdNo.textContent = idx + 1;
+    tr.appendChild(tdNo);
+    // Known Weight
+    const tdWeight = document.createElement('td');
+    tdWeight.style.padding = '2px 2px';
+    tdWeight.style.textAlign = 'center';
+    const inputWeight = document.createElement('input');
+    inputWeight.type = 'number';
+    inputWeight.id = `calib-weight-${idx+1}`;
+    inputWeight.style.width = '80px';
+    inputWeight.style.height = '22px';
+    inputWeight.style.fontSize = '14px';
+    inputWeight.style.padding = '2px 4px';
+    inputWeight.style.margin = '0';
+    inputWeight.style.textAlign = 'right';
+    inputWeight.placeholder = 'Enter weight';
+    inputWeight.value = pt.weight !== null && pt.weight !== undefined ? pt.weight : '';
+    inputWeight.onchange = (e) => {
+      calibrationPoints[idx].weight = parseFloat(e.target.value);
+    };
+    tdWeight.appendChild(inputWeight);
+    tr.appendChild(tdWeight);
+    // Raw Sensor Value
+    const tdRaw = document.createElement('td');
+    tdRaw.id = `calib-raw-${idx+1}`;
+    tdRaw.style.textAlign = 'center';
+    tdRaw.style.padding = '2px 2px';
+    tdRaw.style.fontSize = '15px';
+    tdRaw.textContent = pt.raw !== null && pt.raw !== undefined ? pt.raw.toFixed(2) : '---';
+    tr.appendChild(tdRaw);
+    // Action (Read + Add Row if last row)
+    const tdAction = document.createElement('td');
+    tdAction.style.textAlign = 'center';
+    tdAction.style.padding = '2px 2px';
+    const btnRead = document.createElement('button');
+    btnRead.textContent = 'Read';
+    btnRead.style.color = 'white';
+    btnRead.style.width = '48px';
+    btnRead.style.height = '22px';
+    btnRead.style.fontSize = '13px';
+    btnRead.style.padding = '0 4px';
+    btnRead.style.margin = '0';
+    btnRead.onclick = () => readCalibrationRaw(idx+1);
+    tdAction.appendChild(btnRead);
+    // Add Row button only on the last row, right after Read
+    if (idx === calibrationPoints.length - 1) {
+      const btnAdd = document.createElement('button');
+      btnAdd.textContent = '+';
+      btnAdd.title = 'Add row';
+      btnAdd.style.color = 'white';
+      btnAdd.style.backgroundColor = '#007BC6';
+      btnAdd.style.width = '25px';
+      btnAdd.style.height = '22px';
+      btnAdd.style.fontSize = '13px';
+      btnAdd.style.padding = '0 4px';
+      btnAdd.style.marginLeft = '6px';
+      btnAdd.onclick = addCalibrationRow;
+      tdAction.appendChild(btnAdd);
     }
-    // Extract the first number from the result
-    const match = result.match(/-?\d+(?:\.\d+)?/);
-    return match ? match[0] : result.trim();
-  } catch (error) {
-    console.error('Error reading raw ADC value:', error);
-    return 'Error';
-  }
+    tr.appendChild(tdAction);
+    // Remove (X) button always in its own column
+    const tdRemove = document.createElement('td');
+    tdRemove.style.textAlign = 'center';
+    tdRemove.style.padding = '2px 2px';
+    if (calibrationPoints.length > MIN_CALIB_ROWS) {
+      const btnRemove = document.createElement('button');
+      btnRemove.textContent = '✕';
+      btnRemove.title = 'Remove row';
+      btnRemove.style.color = 'white';
+      btnRemove.style.backgroundColor = '#d9534f';
+      btnRemove.style.width = '28px';
+      btnRemove.style.height = '22px';
+      btnRemove.style.fontSize = '15px';
+      btnRemove.style.padding = '0 4px';
+      btnRemove.style.margin = '0';
+      btnRemove.onclick = () => removeCalibrationRow(idx);
+      tdRemove.appendChild(btnRemove);
+    }
+    tr.appendChild(tdRemove);
+    tbody.appendChild(tr);
+  });
 }
 
+function addCalibrationRow() {
+  calibrationPoints.push({ weight: null, raw: null });
+  renderCalibrationTable();
+}
+function removeCalibrationRow(idx) {
+  if (calibrationPoints.length > MIN_CALIB_ROWS) {
+    calibrationPoints.splice(idx, 1);
+    renderCalibrationTable();
+  }
+}
+// Initialize calibrationPoints with 9 rows on page load
+(function() {
+  calibrationPoints = Array(DEFAULT_CALIB_ROWS).fill().map(() => ({ weight: null, raw: null }));
+  document.addEventListener('DOMContentLoaded', renderCalibrationTable);
+})();
+// Update readCalibrationRaw to use dynamic calibrationPoints
 async function readCalibrationRaw(idx) {
-  // Get the raw sensor value for the current weight
   const weightInput = document.getElementById(`calib-weight-${idx}`);
   const weight = parseFloat(weightInput.value);
   if (isNaN(weight)) {
     alert('Please enter a known weight before reading.');
     return;
   }
-  // Fetch raw sensor value using the correct command
-  const rawValue = await fetchRawSensorValue();
-  document.getElementById(`calib-raw-${idx}`).textContent = rawValue;
-  calibrationPoints[idx - 1] = { weight, raw: parseFloat(rawValue) };
+  // Show loading indicator
+  const rawCell = document.getElementById(`calib-raw-${idx}`);
+  rawCell.textContent = "Averaging...";
+  // Get moving average of 100 readings
+  const avgRawValue = await getMovingAverageRawValue(100, 10); // 100 readings, 10ms apart
+  if (isNaN(avgRawValue)) {
+    rawCell.textContent = "Error";
+    alert("Failed to get a valid average raw value.");
+    return;
+  }
+  rawCell.textContent = avgRawValue.toFixed(2);
+  calibrationPoints[idx - 1] = { weight, raw: avgRawValue };
 }
 
 function calculateCalibration() {
@@ -1135,7 +1228,7 @@ function calculateCalibration() {
   }
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;
-  let resultText = `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}`;
+  let resultText = `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}<br>`;
   // Store for burning
   window._calibSlope = slope;
   window._calibIntercept = intercept;
@@ -1195,9 +1288,9 @@ function calculateCalibration() {
       return gauss(A, B); // [a, b, c, d]
     }
     const [CCA, CCB, CCC, CCD] = cubicFit(x, y);
-    resultText += `\nCubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})`;
+    resultText += `<br>Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})`;
   }
-  document.getElementById('calibration-result').textContent = resultText;
+  document.getElementById('calibration-result').innerHTML = resultText;
 }
 
 async function burnCalibration() {
@@ -1303,6 +1396,50 @@ async function burnCalibration() {
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Helper function to get moving average of N raw sensor values
+async function getMovingAverageRawValue(numReadings = 100, delayMs = 10) {
+  const readings = [];
+  for (let i = 0; i < numReadings; i++) {
+    const rawValue = await fetchRawSensorValue();
+    const parsed = parseFloat(rawValue);
+    if (!isNaN(parsed)) readings.push(parsed);
+    await delay(delayMs); // Small delay to avoid overwhelming the sensor
+  }
+  // Calculate average
+  const sum = readings.reduce((a, b) => a + b, 0);
+  return (readings.length > 0) ? (sum / readings.length) : NaN;
+}
+
+// Restore fetchRawSensorValue globally
+async function fetchRawSensorValue() {
+  // Sends 'R\r' to get the raw ADC value from the sensor
+  const command = 'R\r';
+  try {
+    await writer.write(command);
+    const decoder = new TextDecoder();
+    let result = '';
+    while (true) {
+      const { value, done } = await globalReader.read();
+      if (done) break;
+      result += decoder.decode(value);
+      if (result.includes('\n')) break;
+    }
+    // Extract the first number from the result
+    const match = result.match(/-?\d+(?:\.\d+)?/);
+    return match ? match[0] : result.trim();
+  } catch (error) {
+    console.error('Error reading raw ADC value:', error);
+    return 'Error';
+  }
+}
+
+function openCalibrationModal() {
+  document.getElementById('calibration-modal').style.display = 'flex';
+}
+function closeCalibrationModal() {
+  document.getElementById('calibration-modal').style.display = 'none';
 }
 </script>
 </body>
