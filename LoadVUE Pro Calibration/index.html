@@ -1709,13 +1709,13 @@ function allowMainDisplayPolling() {
 // Patch calibration plot toggle
 function stopCalibRawPlot() {
   calibPlotRunning = false;
-  document.getElementById('calib-plot-toggle').textContent = 'Resume';
+  document.getElementById('calib-plot-toggle').textContent = 'Start';
   pollingMode = 'main';
   allowMainDisplayPolling();
 }
 function resumeCalibRawPlot() {
   calibPlotRunning = true;
-  document.getElementById('calib-plot-toggle').textContent = 'Pause';
+  document.getElementById('calib-plot-toggle').textContent = 'Stop';
   pollingMode = 'calibration';
   stopMainDisplayPolling();
 }
