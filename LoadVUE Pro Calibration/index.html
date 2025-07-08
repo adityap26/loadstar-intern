@@ -77,7 +77,7 @@
     #serialResults {
         white-space: pre;
         height: 30%;
-        width: 75%;
+        width: 100%;
         border-style: solid;
         overflow-y: scroll;
         background-color: #000000;
@@ -166,7 +166,7 @@
     }
 
     .outputBox {
-        width: 75%;
+        width: 100%;
         height: 30vh;
         background-color: #000000;
         border: 1px solid;
@@ -251,6 +251,29 @@
     margin-left: 0;
     table-layout: fixed;
 }
+/* Stylish Burn button */
+.burn-btn {
+    background-color: #007BC6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 16px;
+    font-size: 15px;
+    margin-left: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: background 0.18s, box-shadow 0.18s;
+    vertical-align: middle;
+}
+.burn-btn:hover, .burn-btn:focus {
+    background-color: #005b8a;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.13);
+}
+/* Remove previous calibration-section/table overrides, keep original white style */
+#calib-live-section > div {
+  /* Only style the plot and value area, not the table */
+}
 </style>
 </head>
 <body>
@@ -260,59 +283,46 @@
     <button id="disconnect" style="display: none;margin-right: 98px;height: 36px;font-size: 18px;" onclick="disconnectSerial()" class="button">Disconnect</button>
     <img class="right" src="images/loadstar_sensors_logo.png">
 </div>
-<div class="horizontal-container" id="id-capacity-units-connect">
-    <label class="subheading">ID:</label>
-    <input type="text" class="entrybox" id="sensorID" readonly>
-    <label class="subheading">Capacity:</label>
-    <input type="text" class="entrybox" id="sensorCapacity" readonly>
-    <label class="subheading">Units:</label>
-    <input type="text" class="entrybox" id="sensorUnits" readonly>
-    <label class="subheading">Baud:</label>
-    <input type="text" id="baud" list="baudList" style="width: 10ch;" value = "9600" onclick="this.value = ''"
-        onchange="localStorage.baud = this.value">
-    <datalist id="baudList">
-        <option value="9600">9600</option>
-        <option value="230400">230400</option>
-    </datalist>
-</div>
 <div id="middle" style="margin-top:10px;">
     <div id="reading-content">
         <div id="outputReading" class="outputBox"></div>   
-        <div id="right-section" class="horizontal-align">
-            <div class="value-container">
-                <div class="value-label" style="margin-top:-5px; font-size: 14px !important;">Peak:</div>
-                <div id="peak-value" style="margin-top:7px;">N/A</div>
-            </div>
-            <div class="value-container">
-                <div class="value-label">Low:</div>
-                <div id="low-value">N/A</div>
-            </div>
-            <div class="horizontal-align" style="margin-top:10px;">
-                <label class="value-label">Resolution:</label>
-                <select id="resolutionSelect" onchange="return updateResolution()">
-                    <option value="0">x</option>
-                    <option value="1">x.x</option>
-                    <option value="2" selected>x.xx</option>
-                </select>
-            </div>
-            <div class="horizontal-align" style="margin-top:10px;">
-                <label class="value-label">Units:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                <select id="unitSelect" onchange="updateUnits()">
-                    <option value="lb">lb</option>
-                    <option value="kg">kg</option>
-                    <option value="g">g</option>
-                    <option value="N">N</option>
-                </select>
-            </div>
-            <div class="horizontal-align" style="margin-top:10px;">
-                <label class="value-label">Average:&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                <select id="averageReading" onchange="averageReading()">
-                    <option value="1">1</option>
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
+    </div>
+    <!-- New row for controls and Peak/Low -->
+    <div id="reading-controls-row" style="display: flex; flex-direction: row; align-items: center; gap: 32px; margin-top: 8px; margin-bottom: 8px; width: 100%;">
+        <div class="horizontal-align">
+            <label class="value-label">Resolution:</label>
+            <select id="resolutionSelect" onchange="return updateResolution()">
+                <option value="0">x</option>
+                <option value="1">x.x</option>
+                <option value="2" selected>x.xx</option>
+            </select>
+        </div>
+        <div class="horizontal-align">
+            <label class="value-label">Units:</label>
+            <select id="unitSelect" onchange="updateUnits()">
+                <option value="lb">lb</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="N">N</option>
+            </select>
+        </div>
+        <div class="horizontal-align">
+            <label class="value-label">Average:</label>
+            <select id="averageReading" onchange="averageReading()">
+                <option value="1">1</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <!-- Peak/Low moved here -->
+        <div class="horizontal-align" style="margin-left: 32px;">
+            <div class="value-label" style="font-size: 14px;">Peak:</div>
+            <div id="peak-value" style="background-color: #000000; color: #0000FF; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
+        </div>
+        <div class="horizontal-align">
+            <div class="value-label" style="font-size: 14px;">Low:</div>
+            <div id="low-value" style="background-color: #000000; color: #FF0000; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
         </div>
     </div>
 </div>
@@ -326,43 +336,167 @@
 
 <div style="margin-top:10px; margin-bottom: 10px; font-size: 14; font-weight: bold;">
     Force vs Time Plot:&nbsp;<span id="graphtype" style="text-transform: capitalize;"></span></div>
-<div style="display: flex;">
-    <div id="graph-container" style="width: 75%; height: 30vh;">
+<div style="display: flex; flex-direction: column; width: 100%;">
+    <div id="graph-container" style="width: 100%; height: 30vh;">
         <canvas id="dataChart" style="width: 100%; height: 100%;"></canvas>
     </div>  
-    <div id="right-section2" class="horizontal-align">
-        <button id="calibration-btn" onclick="openCalibrationModal()" style="color:white; width: 100%; height: 25px; margin-bottom: 10px;">Calibration</button>
-        <button onclick="showCumulativeGraph()" style="color:white; width: 100%; height: 25px;">Cumulative</button>
-        <button onclick="showRecentGraph()" style="margin-top: 10px; color:white; width: 100%; height: 25px;">Strip Chart</button>
+    <!-- New row for Cumulative/Strip Chart buttons -->
+    <div id="chart-controls-row" style="display: flex; flex-direction: row; gap: 10px; margin-top: 10px; width: 100%;">
+        <button onclick="showCumulativeGraph()" style="color:white; width: 160px; height: 28px;">Cumulative</button>
+        <button onclick="showRecentGraph()" style="color:white; width: 160px; height: 28px;">Strip Chart</button>
     </div>
+</div>
+<!-- Calibration Utility always visible under the Force vs Time Plot -->
+<div id="calibration-section" style="width: 100%; background: none; padding: 0; border-radius: 0; max-width: 100%; min-width: 0; margin: 0; position: relative;">
+  <div id="calibration-modal-body">
+    <h2 style="margin-bottom: 10px;">Calibration Utility</h2>
+    <!-- Tab Bar -->
+    <div id="calib-tabs" style="display: flex; gap: 8px; margin-bottom: 18px;">
+      <button class="calib-tab-btn" data-tab="specs" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Specifications</button>
+      <button class="calib-tab-btn" data-tab="2pt" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">2-Point Calibration</button>
+      <button class="calib-tab-btn" data-tab="multi" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Multi-Point Calibration</button>
+    </div>
+    <!-- Tab Contents -->
+    <div id="calib-tab-content-specs" class="calib-tab-content">
+      <!-- Specifications Tab Content -->
+      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 480px; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="sensorID" style="min-width: 110px;">ID:</label>
+          <input type="text" class="entrybox" id="sensorID" style="border: 1.5px solid #888; background: #fff;">
+          <button onclick="burnID()" class="burn-btn">Burn</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="sensorCapacity" style="min-width: 110px;">Capacity:</label>
+          <input type="text" class="entrybox" id="sensorCapacity" style="border: 1.5px solid #888; background: #fff;">
+          <button onclick="burnCapacity()" class="burn-btn">Burn</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="sensorUnits" style="min-width: 110px;">Units:</label>
+          <select id="sensorUnits" onchange="burnUnits()" style="border: 1.5px solid #888; background: #fff;">
+            <option value="lb">lb</option>
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+            <option value="N">N</option>
+          </select>
+          <button onclick="burnUnits()" class="burn-btn">Burn</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="ncal-mode" style="min-width: 110px;">Calibration Mode (NCAL):</label>
+          <select id="ncal-mode" onchange="setNCALMode()" style="border: 1.5px solid #888; background: #fff;">
+            <option value="1">Single Direction (Compression Only)</option>
+            <option value="2">Both Directions (Compression + Tension)</option>
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="baud" style="min-width: 110px;">Baud Rate:</label>
+          <input type="number" class="entrybox" id="baud" value="9600" min="1" style="border: 1.5px solid #888; background: #fff;">
+        </div>
+      </div>
+      <div id="specs-summary" style="margin-top: 10px; font-size: 15px; color: #333;"></div>
+    </div>
+    <div id="calib-tab-content-2pt" class="calib-tab-content" style="display:none;">
+      <!-- 2-Point Calibration Tab Content -->
+      <div style="margin-bottom: 10px;">
+        <strong>2-Point Calibration Instructions:</strong><br>
+        1. Enter two different known loads (e.g., 0 and 100)<br>
+        2. Click "Capture" for each load to capture the raw sensor values<br>
+        3. Click "Calculate Calibration" to see the linear fit<br>
+        4. Click "Burn 2-Point Calibration" to save to sensor
+      </div>
+      <table style="width: 100%; max-width: 400px; margin-bottom: 10px;">
+        <tr>
+          <th>Load (Known)</th>
+          <th>Raw Value</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td><input type="number" id="twopt-load1" style="width: 80px;"></td>
+          <td id="twopt-raw1">---</td>
+          <td><button onclick="read2ptRaw(1)" class="burn-btn">Capture</button></td>
+        </tr>
+        <tr>
+          <td><input type="number" id="twopt-load2" style="width: 80px;"></td>
+          <td id="twopt-raw2">---</td>
+          <td><button onclick="read2ptRaw(2)" class="burn-btn">Capture</button></td>
+        </tr>
+      </table>
+      <button onclick="calculate2ptCalibration()" class="burn-btn" style="width: 180px;">Calculate Calibration</button>
+      <button onclick="burn2ptCalibration()" class="burn-btn" style="width: 180px;">Burn 2-Point Calibration</button>
+      <div id="calibration-result-2pt" style="margin-top: 8px; font-size: 15px;"></div>
+    </div>
+    <div id="calib-tab-content-multi" class="calib-tab-content" style="display:none;">
+      <!-- Multi-Point Calibration Tab Content (with both directions) -->
+      <div id="calib-live-section" style="width: 100%; max-width: 100vw; margin-bottom: 18px; display: flex; flex-direction: column; align-items: center;">
+        <div style="display: flex; flex-direction: row; width: 100%; gap: 0;">
+          <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; border-radius: 8px 0 0 8px; min-width: 0;">
+            <div style="font-size: 32px; color: #FF6384; margin-bottom: 12px; margin-top: 24px; background: #000;">Current Raw Value</div>
+            <div id="calib-current-raw" style="width: 100%; height: 180px; background: #000; color: #fff; font-size: 64px; display: flex; align-items: center; justify-content: center; border-radius: 0; border: none; font-family: 'Segoe UI', monospace;">---</div>
+          </div>
+          <div style="flex: 2; display: flex; flex-direction: column; align-items: center; background: #000; border-radius: 0 8px 8px 0; min-width: 0;">
+            <div style="font-size: 32px; color: #FF6384; margin-bottom: 12px; margin-top: 24px; background: #000;">Raw Value Plot</div>
+            <canvas id="calib-raw-plot" width="900" height="240" style="background: #000; border-radius: 0; border: none; width: 100%; max-width: 100%;"></canvas>
+          </div>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: center; margin-top: 18px;">
+          <button id="calib-plot-toggle" class="burn-btn" style="height: 56px; min-width: 160px; font-size: 24px; background: #007BC6; color: #fff; border-radius: 6px; border: none;">Resume</button>
+          <button id="calib-plot-clear" class="burn-btn" style="height: 56px; min-width: 120px; font-size: 24px; background: #d9534f; color: #fff; border-radius: 6px; border: none; margin-left: 12px;">Clear</button>
+        </div>
+      </div>
+      <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
+        <thead>
+          <tr>
+            <th colspan="4" style="text-align: center; background: #e0e0e0;">Compression</th>
+            <th colspan="4" style="text-align: center; background: #f0f0f0;">Tension</th>
+          </tr>
+          <tr>
+            <th style="width: 30px; text-align: center;">#</th>
+            <th style="width: 100px; text-align: center;">Known Load</th>
+            <th style="width: 100px; text-align: center;">Raw</th>
+            <th style="width: 70px; text-align: center;">Capture</th>
+            <th style="width: 30px; text-align: center;">#</th>
+            <th style="width: 100px; text-align: center;">Known Load</th>
+            <th style="width: 100px; text-align: center;">Raw</th>
+            <th style="width: 70px; text-align: center;">Capture</th>
+          </tr>
+        </thead>
+        <tbody id="calibration-table-body">
+          <!-- Dynamic rows will be rendered here -->
+        </tbody>
+      </table>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <button onclick="calculateCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Calculate Calibration</button>
+        <button onclick="burnCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Burn Calibration</button>
+      </div>
+      <div id="calibration-result" style="margin-top: 8px; font-size: 15px;"></div>
+    </div>
+  </div>
 </div>
    
 <!-- Log Data -->
-<div style="margin-top:10px; margin-bottom: 10px; font-size: 14; font-weight: bold;">Log Data</div>
-<div style="display: flex;">
-    <div id="table-container" style="width: 75%; font-size: 12px;">
+<div style="margin-top:20px; margin-bottom: 10px; font-size: 24px; font-weight: bold;">Log Data</div>
+<div style="display: flex; width: 100%;">
+    <div id="table-container" style="width: 100%; font-size: 12px;">
         <table id="data-table">
-           
             <tbody>
                 <!-- Data rows will be dynamically added here -->
             </tbody>
         </table>
     </div>
-    <div id="right-section3" class="horizontal-align">
-        <button onclick="saveData()" style="color:white; width: 100%; height: 25px;">Save Data</button>
-    </div>
+</div>
+<!-- Save Data button row (moved below the table) -->
+<div id="save-data-row" style="display: flex; flex-direction: row; justify-content: flex-start; width: 100%; margin-bottom: 6px; margin-top: 6px;">
+    <button onclick="saveData()" style="color:white; width: 160px; height: 28px;">Save Data</button>
 </div>
 
 <div id="footer" style="background-color: #B2E4FF; text-align: center; padding: 5px; margin-top: 10px;">
 Loadstar Sensors Copyright 2025 All Rights Reserved.
 </div>
 
-<!-- Calibration Modal (hidden by default) -->
 <div id="calibration-modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
   <div id="calibration-modal-content" style="background:#fff; padding:24px 18px 18px 18px; border-radius:8px; min-width:420px; max-width:90vw; max-height:90vh; overflow:auto; position:relative;">
     <button onclick="closeCalibrationModal()" style="position:absolute; top:8px; right:12px; font-size:20px; background:none; color:#333; border:none; cursor:pointer;">&times;</button>
     <div id="calibration-modal-body">
-      <h2 style="margin-bottom: 10px;">Multi-Point Calibration</h2>
+      <h2 style="margin-bottom: 10px;">Calibration Utility</h2>
       <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
         <thead>
           <tr>
@@ -438,17 +572,15 @@ Loadstar Sensors Copyright 2025 All Rights Reserved.
 
             // Fetch and display sensor units after connecting
             const sensorUnits = await fetchSensorUnits();
-            document.getElementById("sensorUnits").value = sensorUnits;
+            // Normalize and set sensorUnits dropdown
             if (sensorUnits) {
-                _currentUnit = sensorUnits.trim().toLowerCase();
-                const unitsMapping = {
-                'lb': 'lb',
-                'kg': 'kg',
-                'g': 'g',
-                'n': 'N'
-            };
-            currentUnit = unitsMapping[_currentUnit];
-            document.getElementById("unitSelect").value = currentUnit;
+                let normalized = sensorUnits.trim();
+                if (normalized.toLowerCase() === 'n') normalized = 'N';
+                if (["lb", "kg", "g", "N"].includes(normalized)) {
+                    document.getElementById("sensorUnits").value = normalized;
+                } else {
+                    document.getElementById("sensorUnits").value = "lb";
+                }
             }
 
         document.getElementById("connect").style.display = "none";
@@ -762,6 +894,10 @@ function stopReading() {
     let isStart = false;
     let avgCount = 1;
     async function showReading() {
+        if (pollingMode === 'calibration') {
+            alert('Pause the calibration plot to resume main display reading.');
+            return;
+        }
         if (readingInterval) {
             clearInterval(readingInterval);  // Clear any existing interval
         }
@@ -1076,67 +1212,62 @@ function clearTable() {
 </script>
 
 <script>
-// Store calibration data dynamically
-let calibrationPoints = [];
+// Store calibration data for both directions
+globalThis.calibrationPointsCompression = [];
+globalThis.calibrationPointsTension = [];
 const MIN_CALIB_ROWS = 1;
 const DEFAULT_CALIB_ROWS = 9;
+let ncalMode = 1; // 1 = compression only, 2 = both
+
+function setNCALMode() {
+  ncalMode = parseInt(document.getElementById('ncal-mode').value);
+  renderCalibrationTable();
+}
 
 function renderCalibrationTable() {
   const tbody = document.getElementById('calibration-table-body');
   tbody.innerHTML = '';
-  calibrationPoints.forEach((pt, idx) => {
+  for (let idx = 0; idx < Math.max(calibrationPointsCompression.length, calibrationPointsTension.length); idx++) {
     const tr = document.createElement('tr');
-    // Point No.
-    const tdNo = document.createElement('td');
-    tdNo.style.textAlign = 'center';
-    tdNo.style.padding = '2px 2px';
-    tdNo.style.fontSize = '15px';
-    tdNo.textContent = idx + 1;
-    tr.appendChild(tdNo);
-    // Known Weight
-    const tdWeight = document.createElement('td');
-    tdWeight.style.padding = '2px 2px';
-    tdWeight.style.textAlign = 'center';
-    const inputWeight = document.createElement('input');
-    inputWeight.type = 'number';
-    inputWeight.id = `calib-weight-${idx+1}`;
-    inputWeight.style.width = '80px';
-    inputWeight.style.height = '22px';
-    inputWeight.style.fontSize = '14px';
-    inputWeight.style.padding = '2px 4px';
-    inputWeight.style.margin = '0';
-    inputWeight.style.textAlign = 'right';
-    inputWeight.placeholder = 'Enter weight';
-    inputWeight.value = pt.weight !== null && pt.weight !== undefined ? pt.weight : '';
-    inputWeight.onchange = (e) => {
-      calibrationPoints[idx].weight = parseFloat(e.target.value);
-    };
-    tdWeight.appendChild(inputWeight);
-    tr.appendChild(tdWeight);
-    // Raw Sensor Value
-    const tdRaw = document.createElement('td');
-    tdRaw.id = `calib-raw-${idx+1}`;
-    tdRaw.style.textAlign = 'center';
-    tdRaw.style.padding = '2px 2px';
-    tdRaw.style.fontSize = '15px';
-    tdRaw.textContent = pt.raw !== null && pt.raw !== undefined ? pt.raw.toFixed(2) : '---';
-    tr.appendChild(tdRaw);
-    // Action (Read + Add Row if last row)
-    const tdAction = document.createElement('td');
-    tdAction.style.textAlign = 'center';
-    tdAction.style.padding = '2px 2px';
-    const btnRead = document.createElement('button');
-    btnRead.textContent = 'Read';
-    btnRead.style.color = 'white';
-    btnRead.style.width = '48px';
-    btnRead.style.height = '22px';
-    btnRead.style.fontSize = '13px';
-    btnRead.style.padding = '0 4px';
-    btnRead.style.margin = '0';
-    btnRead.onclick = () => readCalibrationRaw(idx+1);
-    tdAction.appendChild(btnRead);
-    // Add Row button only on the last row, right after Read
-    if (idx === calibrationPoints.length - 1) {
+    // Compression Row Number
+    const tdCompNum = document.createElement('td');
+    tdCompNum.style.textAlign = 'center';
+    tdCompNum.textContent = idx + 1;
+    tr.appendChild(tdCompNum);
+    // Compression Known Load
+    const tdCompLoad = document.createElement('td');
+    const inputCompLoad = document.createElement('input');
+    inputCompLoad.type = 'number';
+    inputCompLoad.id = `comp-load-${idx+1}`;
+    inputCompLoad.style.width = '80px';
+    inputCompLoad.style.height = '22px';
+    inputCompLoad.style.fontSize = '14px';
+    inputCompLoad.style.textAlign = 'center';
+    inputCompLoad.placeholder = 'Enter';
+    inputCompLoad.value = calibrationPointsCompression[idx]?.weight ?? '';
+    inputCompLoad.onchange = (e) => { calibrationPointsCompression[idx].weight = parseFloat(e.target.value); };
+    tdCompLoad.appendChild(inputCompLoad);
+    tr.appendChild(tdCompLoad);
+    // Compression Raw
+    const tdCompRaw = document.createElement('td');
+    tdCompRaw.id = `comp-raw-${idx+1}`;
+    tdCompRaw.style.textAlign = 'center';
+    tdCompRaw.textContent = calibrationPointsCompression[idx]?.raw !== undefined && calibrationPointsCompression[idx]?.raw !== null ? calibrationPointsCompression[idx].raw.toFixed(2) : '---';
+    tr.appendChild(tdCompRaw);
+    // Compression Read + Add/Remove
+    const tdCompRead = document.createElement('td');
+    tdCompRead.style.display = 'flex';
+    tdCompRead.style.alignItems = 'center';
+    const btnCompRead = document.createElement('button');
+    btnCompRead.textContent = 'Capture';
+    btnCompRead.style.color = 'white';
+    btnCompRead.style.width = '60px';
+    btnCompRead.style.height = '22px';
+    btnCompRead.style.fontSize = '13px';
+    btnCompRead.onclick = () => readCalibrationRaw(idx+1, 'compression');
+    tdCompRead.appendChild(btnCompRead);
+    // Add button (only on last row)
+    if (idx === calibrationPointsCompression.length - 1) {
       const btnAdd = document.createElement('button');
       btnAdd.textContent = '+';
       btnAdd.title = 'Add row';
@@ -1145,17 +1276,12 @@ function renderCalibrationTable() {
       btnAdd.style.width = '25px';
       btnAdd.style.height = '22px';
       btnAdd.style.fontSize = '13px';
-      btnAdd.style.padding = '0 4px';
       btnAdd.style.marginLeft = '6px';
-      btnAdd.onclick = addCalibrationRow;
-      tdAction.appendChild(btnAdd);
+      btnAdd.onclick = () => addCalibrationRow('compression');
+      tdCompRead.appendChild(btnAdd);
     }
-    tr.appendChild(tdAction);
-    // Remove (X) button always in its own column
-    const tdRemove = document.createElement('td');
-    tdRemove.style.textAlign = 'center';
-    tdRemove.style.padding = '2px 2px';
-    if (calibrationPoints.length > MIN_CALIB_ROWS) {
+    // Remove button (if more than min rows)
+    if (calibrationPointsCompression.length > MIN_CALIB_ROWS && calibrationPointsTension.length > MIN_CALIB_ROWS) {
       const btnRemove = document.createElement('button');
       btnRemove.textContent = '✕';
       btnRemove.title = 'Remove row';
@@ -1164,56 +1290,141 @@ function renderCalibrationTable() {
       btnRemove.style.width = '28px';
       btnRemove.style.height = '22px';
       btnRemove.style.fontSize = '15px';
-      btnRemove.style.padding = '0 4px';
-      btnRemove.style.margin = '0';
+      btnRemove.style.marginLeft = '6px';
       btnRemove.onclick = () => removeCalibrationRow(idx);
-      tdRemove.appendChild(btnRemove);
+      tdCompRead.appendChild(btnRemove);
     }
-    tr.appendChild(tdRemove);
+    tr.appendChild(tdCompRead);
+    // Tension Row Number
+    const tdTenNum = document.createElement('td');
+    tdTenNum.style.textAlign = 'center';
+    tdTenNum.textContent = idx + 1;
+    tr.appendChild(tdTenNum);
+    // Tension Known Load
+    const tdTenLoad = document.createElement('td');
+    const inputTenLoad = document.createElement('input');
+    inputTenLoad.type = 'number';
+    inputTenLoad.id = `ten-load-${idx+1}`;
+    inputTenLoad.style.width = '80px';
+    inputTenLoad.style.height = '22px';
+    inputTenLoad.style.fontSize = '14px';
+    inputTenLoad.style.textAlign = 'center';
+    inputTenLoad.placeholder = 'Enter';
+    inputTenLoad.value = calibrationPointsTension[idx]?.weight ?? '';
+    inputTenLoad.onchange = (e) => { calibrationPointsTension[idx].weight = parseFloat(e.target.value); };
+    if (ncalMode === 1) { inputTenLoad.disabled = true; inputTenLoad.style.background = '#eee'; }
+    tdTenLoad.appendChild(inputTenLoad);
+    tr.appendChild(tdTenLoad);
+    // Tension Raw
+    const tdTenRaw = document.createElement('td');
+    tdTenRaw.id = `ten-raw-${idx+1}`;
+    tdTenRaw.style.textAlign = 'center';
+    tdTenRaw.textContent = calibrationPointsTension[idx]?.raw !== undefined && calibrationPointsTension[idx]?.raw !== null ? calibrationPointsTension[idx].raw.toFixed(2) : '---';
+    if (ncalMode === 1) { tdTenRaw.style.background = '#eee'; }
+    tr.appendChild(tdTenRaw);
+    // Tension Read + Add/Remove
+    const tdTenRead = document.createElement('td');
+    tdTenRead.style.display = 'flex';
+    tdTenRead.style.alignItems = 'center';
+    const btnTenRead = document.createElement('button');
+    btnTenRead.textContent = 'Capture';
+    btnTenRead.style.color = 'white';
+    btnTenRead.style.width = '60px';
+    btnTenRead.style.height = '22px';
+    btnTenRead.style.fontSize = '13px';
+    btnTenRead.onclick = () => readCalibrationRaw(idx+1, 'tension');
+    if (ncalMode === 1) { btnTenRead.disabled = true; btnTenRead.style.background = '#eee'; }
+    tdTenRead.appendChild(btnTenRead);
+    // Add button (only on last row)
+    if (idx === calibrationPointsTension.length - 1) {
+      const btnAdd = document.createElement('button');
+      btnAdd.textContent = '+';
+      btnAdd.title = 'Add row';
+      btnAdd.style.color = 'white';
+      btnAdd.style.backgroundColor = '#007BC6';
+      btnAdd.style.width = '25px';
+      btnAdd.style.height = '22px';
+      btnAdd.style.fontSize = '13px';
+      btnAdd.style.marginLeft = '6px';
+      btnAdd.onclick = () => addCalibrationRow('tension');
+      if (ncalMode !== 1) tdTenRead.appendChild(btnAdd);
+    }
+    // Remove button (if more than min rows)
+    if (calibrationPointsCompression.length > MIN_CALIB_ROWS && calibrationPointsTension.length > MIN_CALIB_ROWS) {
+      const btnRemove = document.createElement('button');
+      btnRemove.textContent = '✕';
+      btnRemove.title = 'Remove row';
+      btnRemove.style.color = 'white';
+      btnRemove.style.backgroundColor = '#d9534f';
+      btnRemove.style.width = '28px';
+      btnRemove.style.height = '22px';
+      btnRemove.style.fontSize = '15px';
+      btnRemove.style.marginLeft = '6px';
+      btnRemove.onclick = () => removeCalibrationRow(idx);
+      if (ncalMode !== 1) tdTenRead.appendChild(btnRemove);
+    }
+    tr.appendChild(tdTenRead);
     tbody.appendChild(tr);
-  });
+  }
 }
-
-function addCalibrationRow() {
-  calibrationPoints.push({ weight: null, raw: null });
+function addCalibrationRow(direction) {
+  // Always add a row to both arrays to keep them aligned
+  calibrationPointsCompression.push({ weight: null, raw: null });
+  calibrationPointsTension.push({ weight: null, raw: null });
   renderCalibrationTable();
 }
 function removeCalibrationRow(idx) {
-  if (calibrationPoints.length > MIN_CALIB_ROWS) {
-    calibrationPoints.splice(idx, 1);
+  // Only remove if both arrays have more than the minimum rows
+  if (calibrationPointsCompression.length > MIN_CALIB_ROWS && calibrationPointsTension.length > MIN_CALIB_ROWS) {
+    calibrationPointsCompression.splice(idx, 1);
+    calibrationPointsTension.splice(idx, 1);
     renderCalibrationTable();
   }
 }
-// Initialize calibrationPoints with 9 rows on page load
+// Initialize calibration points
 (function() {
-  calibrationPoints = Array(DEFAULT_CALIB_ROWS).fill().map(() => ({ weight: null, raw: null }));
+  calibrationPointsCompression = Array(DEFAULT_CALIB_ROWS).fill().map(() => ({ weight: null, raw: null }));
+  calibrationPointsTension = Array(DEFAULT_CALIB_ROWS).fill().map(() => ({ weight: null, raw: null }));
   document.addEventListener('DOMContentLoaded', renderCalibrationTable);
 })();
-// Update readCalibrationRaw to use dynamic calibrationPoints
-async function readCalibrationRaw(idx) {
-  const weightInput = document.getElementById(`calib-weight-${idx}`);
+// Update readCalibrationRaw to use direction
+async function readCalibrationRaw(idx, direction) {
+  let weightInput, rawCell, arr;
+  if (direction === 'compression') {
+    weightInput = document.getElementById(`comp-load-${idx}`);
+    rawCell = document.getElementById(`comp-raw-${idx}`);
+    arr = calibrationPointsCompression;
+  } else {
+    weightInput = document.getElementById(`ten-load-${idx}`);
+    rawCell = document.getElementById(`ten-raw-${idx}`);
+    arr = calibrationPointsTension;
+  }
   const weight = parseFloat(weightInput.value);
   if (isNaN(weight)) {
-    alert('Please enter a known weight before reading.');
+    alert('Please enter a known load before reading.');
     return;
   }
-  // Show loading indicator
-  const rawCell = document.getElementById(`calib-raw-${idx}`);
-  rawCell.textContent = "Averaging...";
-  // Get moving average of 100 readings
-  const avgRawValue = await getMovingAverageRawValue(100, 10); // 100 readings, 10ms apart
+  rawCell.textContent = 'Averaging...';
+  const avgRawValue = await getMovingAverageRawValue(100, 10);
   if (isNaN(avgRawValue)) {
-    rawCell.textContent = "Error";
-    alert("Failed to get a valid average raw value.");
+    rawCell.textContent = 'Error';
+    alert('Failed to get a valid average raw value.');
     return;
   }
   rawCell.textContent = avgRawValue.toFixed(2);
-  calibrationPoints[idx - 1] = { weight, raw: avgRawValue };
+  arr[idx - 1] = { weight, raw: avgRawValue };
 }
 
 function calculateCalibration() {
-  // Gather all valid points
-  const points = calibrationPoints.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+  let points = [];
+  if (ncalMode === 1) {
+    points = calibrationPointsCompression.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+  } else {
+    // Merge valid points from both arrays
+    const comp = calibrationPointsCompression.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+    const ten = calibrationPointsTension.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+    points = comp.concat(ten);
+  }
   if (points.length < 2) {
     document.getElementById('calibration-result').textContent = 'At least 2 points are required for calibration.';
     return;
@@ -1232,7 +1443,6 @@ function calculateCalibration() {
   // Store for burning
   window._calibSlope = slope;
   window._calibIntercept = intercept;
-
   // If at least 4 points, also show cubic fit
   if (points.length >= 4) {
     const x = points.map(pt => pt.weight);
@@ -1290,12 +1500,24 @@ function calculateCalibration() {
     const [CCA, CCB, CCC, CCD] = cubicFit(x, y);
     resultText += `<br>Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})`;
   }
+  // Show which points were used
+  if (ncalMode === 1) {
+    resultText += '<br><em>Used only compression points.</em>';
+  } else {
+    resultText += '<br><em>Used both compression and tension points.</em>';
+  }
   document.getElementById('calibration-result').innerHTML = resultText;
 }
 
 async function burnCalibration() {
-  // Gather all valid points
-  const validPoints = calibrationPoints.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+  let validPoints = [];
+  if (ncalMode === 1) {
+    validPoints = calibrationPointsCompression.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+  } else {
+    const comp = calibrationPointsCompression.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+    const ten = calibrationPointsTension.filter(pt => pt.weight !== null && pt.raw !== null && !isNaN(pt.weight) && !isNaN(pt.raw));
+    validPoints = comp.concat(ten);
+  }
   if (validPoints.length < 4) {
     alert('At least 4 calibration points are required for cubic calibration.');
     return;
@@ -1303,7 +1525,6 @@ async function burnCalibration() {
   // Prepare arrays for cubic fit
   const x = validPoints.map(pt => pt.weight);
   const y = validPoints.map(pt => pt.raw);
-
   // Cubic fit using least squares (returns [a, b, c, d] for ax^3 + bx^2 + cx + d)
   function cubicFit(x, y) {
     const n = x.length;
@@ -1324,10 +1545,6 @@ async function burnCalibration() {
       sumX3Y += xi3 * yi;
     }
     // Solve the normal equations for cubic fit
-    // [ [Sx6 Sx5 Sx4 Sx3]   [a]   [Sx3y]
-    //   [Sx5 Sx4 Sx3 Sx2] * [b] = [Sx2y]
-    //   [Sx4 Sx3 Sx2 Sx1]   [c]   [Sxy ]
-    //   [Sx3 Sx2 Sx1 n  ]   [d]   [Sy  ] ]
     const A = [
       [sumX6, sumX5, sumX4, sumX3],
       [sumX5, sumX4, sumX3, sumX2],
@@ -1339,21 +1556,18 @@ async function burnCalibration() {
     function gauss(A, B) {
       const n = B.length;
       for (let i = 0; i < n; i++) {
-        // Partial pivot
         let maxRow = i;
         for (let k = i + 1; k < n; k++) {
           if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) maxRow = k;
         }
         [A[i], A[maxRow]] = [A[maxRow], A[i]];
         [B[i], B[maxRow]] = [B[maxRow], B[i]];
-        // Eliminate
         for (let k = i + 1; k < n; k++) {
           const c = A[k][i] / A[i][i];
           for (let j = i; j < n; j++) A[k][j] -= c * A[i][j];
           B[k] -= c * B[i];
         }
       }
-      // Back substitution
       const x = Array(n).fill(0);
       for (let i = n - 1; i >= 0; i--) {
         x[i] = B[i];
@@ -1364,19 +1578,16 @@ async function burnCalibration() {
     }
     return gauss(A, B); // [a, b, c, d]
   }
-
   // Fit cubic: raw = a*x^3 + b*x^2 + c*x + d
   const [CCA, CCB, CCC, CCD] = cubicFit(x, y);
   // Use the first raw value as FAZ (offset)
   const FAZ = validPoints[0].raw;
-
   // Show the cubic fit equation and coefficients
   document.getElementById('calibration-result').textContent =
-    `Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})\nFAZ = ${FAZ}`;
-
-  // Send the coefficients to the sensor for universal calibration (compression)
+    `Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})\nFAZ = ${FAZ}` + (ncalMode === 2 ? '\n(Used both compression and tension points)' : '\n(Used only compression points)');
+  // Send the coefficients to the sensor for universal calibration
   try {
-    await writer.write(`ncal 2\r`); // Universal calibration mode
+    await writer.write(`ncal ${ncalMode}\r`); // Set NCAL mode
     await delay(500);
     await writer.write(`CCA ${CCA}\r`);
     await delay(500);
@@ -1441,6 +1652,315 @@ function openCalibrationModal() {
 function closeCalibrationModal() {
   document.getElementById('calibration-modal').style.display = 'none';
 }
+
+async function burnID() {
+    const newID = document.getElementById("sensorID").value;
+    if (!newID) { alert("ID cannot be empty"); return; }
+    try {
+        await writer.write(`ss1 ${newID}\r`);
+        alert("ID burned to sensor successfully!");
+    } catch (e) {
+        alert("Failed to burn ID: " + e);
+    }
+}
+async function burnCapacity() {
+    const newCap = document.getElementById("sensorCapacity").value;
+    if (!newCap) { alert("Capacity cannot be empty"); return; }
+    try {
+        await writer.write(`slc ${newCap}\r`);
+        alert("Capacity burned to sensor successfully!");
+    } catch (e) {
+        alert("Failed to burn Capacity: " + e);
+    }
+}
+async function burnUnits() {
+    const newUnits = document.getElementById("sensorUnits").value;
+    if (!newUnits) { alert("Units cannot be empty"); return; }
+    try {
+        await writer.write(`unit ${newUnits}\r`);
+        alert("Units burned to sensor successfully!");
+    } catch (e) {
+        alert("Failed to burn Units: " + e);
+    }
+}
+// Calibration live raw value/plot state
+let calibPlotRunning = false; // Start paused by default
+let calibRawHistory = [];
+const CALIB_RAW_HISTORY_MAX = 100;
+let calibRawPlot = null;
+let calibRawInterval = null;
+
+// Add global state for polling control
+let pollingMode = 'main'; // 'main' or 'calibration'
+
+// Patch calibration plot controls to pause/resume main display polling
+function stopMainDisplayPolling() {
+  if (readingInterval) {
+    clearInterval(readingInterval);
+    readingInterval = null;
+    document.getElementById("stop").style.display = "none";
+    document.getElementById("read").style.display = "block";
+  }
+  isStart = false;
+}
+function allowMainDisplayPolling() {
+  // No-op: showReading can be called by user
+}
+// Patch calibration plot toggle
+function stopCalibRawPlot() {
+  calibPlotRunning = false;
+  document.getElementById('calib-plot-toggle').textContent = 'Resume';
+  pollingMode = 'main';
+  allowMainDisplayPolling();
+}
+function resumeCalibRawPlot() {
+  calibPlotRunning = true;
+  document.getElementById('calib-plot-toggle').textContent = 'Pause';
+  pollingMode = 'calibration';
+  stopMainDisplayPolling();
+}
+// Patch calibration plot startup
+function startCalibRawPlot() {
+  if (calibRawInterval) clearInterval(calibRawInterval);
+  calibPlotRunning = true;
+  pollingMode = 'calibration';
+  stopMainDisplayPolling();
+  document.getElementById('calib-plot-toggle').textContent = 'Pause';
+  calibRawInterval = setInterval(async () => {
+    if (!calibPlotRunning) return;
+    // Only fetch if main display is not polling
+    if (pollingMode !== 'calibration') return;
+    const rawVal = await fetchRawSensorValue();
+    const parsed = parseFloat(rawVal);
+    if (!isNaN(parsed)) {
+      calibRawHistory.push(parsed);
+      if (calibRawHistory.length > CALIB_RAW_HISTORY_MAX) calibRawHistory.shift();
+      document.getElementById('calib-current-raw').textContent = parsed.toFixed(2);
+      updateCalibRawPlot();
+    }
+  }, 200);
+}
+function updateCalibRawPlot() {
+  if (!calibRawPlot) return;
+  calibRawPlot.data.labels = calibRawHistory.map((_, i) => i);
+  calibRawPlot.data.datasets[0].data = calibRawHistory;
+  calibRawPlot.update();
+}
+function setupCalibRawPlot() {
+  const ctx = document.getElementById('calib-raw-plot').getContext('2d');
+  calibRawPlot = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Raw',
+        backgroundColor: 'rgba(0,0,0,0)',
+        borderColor: '#FF6384', // Use the same color as the heading
+        data: [],
+        fill: false,
+        pointRadius: 0,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      animation: false,
+      responsive: false,
+      legend: {
+        display: true,
+        labels: {
+          usePointStyle: true,
+          boxWidth: 0,
+          fontColor: '#fff',
+          padding: 12,
+          generateLabels: function(chart) {
+            // Only show text, no box
+            return [{
+              text: 'Raw',
+              fillStyle: 'rgba(0,0,0,0)',
+              strokeStyle: 'rgba(0,0,0,0)',
+              lineWidth: 0,
+              hidden: false,
+              index: 0
+            }];
+          }
+        }
+      },
+      scales: {
+        xAxes: [{ display: false }],
+        yAxes: [{ display: true, ticks: { fontSize: 10, fontColor: '#fff' }, gridLines: { color: 'rgba(255,255,255,0.1)' } }]
+      },
+      elements: { line: { tension: 0 } }
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  setupCalibRawPlot();
+  // Do NOT startCalibRawPlot() by default
+  document.getElementById('calib-plot-toggle').onclick = function() {
+    if (calibPlotRunning) stopCalibRawPlot();
+    else startCalibRawPlot(); // Only start polling when user presses Resume
+  };
+  // Set button to Resume by default
+  document.getElementById('calib-plot-toggle').textContent = 'Resume';
+  // Add Clear button handler
+  document.getElementById('calib-plot-clear').onclick = function() {
+    calibRawHistory = [];
+    if (calibRawPlot) {
+      calibRawPlot.data.labels = [];
+      calibRawPlot.data.datasets[0].data = [];
+      calibRawPlot.update();
+    }
+    document.getElementById('calib-current-raw').textContent = '---';
+  };
+});
+// Patch readCalibrationRaw to pause/resume plot
+const origReadCalibrationRaw = readCalibrationRaw;
+readCalibrationRaw = async function(idx, direction) {
+  stopCalibRawPlot();
+  await origReadCalibrationRaw(idx, direction);
+  // After reading, allow user to resume
+  setTimeout(() => {
+    resumeCalibRawPlot();
+  }, 500); // Small delay to avoid overlap
+};
+</script>
+
+<script>
+// Tab switching logic for Calibration Utility
+(function() {
+  function showTab(tab) {
+    document.querySelectorAll('.calib-tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById('calib-tab-content-' + tab).style.display = 'block';
+    document.querySelectorAll('.calib-tab-btn').forEach(btn => btn.style.background = '#e0e0e0');
+    document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').style.background = '#fff';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.calib-tab-btn').forEach(btn => {
+      btn.onclick = function() { showTab(btn.getAttribute('data-tab')); };
+    });
+    showTab('specs'); // Default tab
+  });
+})();
+// 2-Point Calibration logic (stub, to be implemented)
+window.read2ptRaw = async function(idx) {
+  const input = document.getElementById('twopt-load' + idx);
+  const rawCell = document.getElementById('twopt-raw' + idx);
+  const weight = parseFloat(input.value);
+  if (isNaN(weight)) { alert('Please enter a known load before reading.'); return; }
+  
+  // Pause calibration plot if running
+  const wasPlotRunning = calibPlotRunning;
+  if (wasPlotRunning) {
+    stopCalibRawPlot();
+  }
+  
+  rawCell.textContent = 'Averaging...';
+  const avgRawValue = await getMovingAverageRawValue(100, 10);
+  if (isNaN(avgRawValue)) {
+    rawCell.textContent = 'Error';
+    alert('Failed to get a valid average raw value.');
+    return;
+  }
+  rawCell.textContent = avgRawValue.toFixed(2);
+  input.setAttribute('data-raw', avgRawValue);
+  
+  // Resume plot if it was running before
+  if (wasPlotRunning) {
+    setTimeout(() => {
+      resumeCalibRawPlot();
+    }, 500);
+  }
+};
+window.calculate2ptCalibration = function() {
+  const w1 = parseFloat(document.getElementById('twopt-load1').value);
+  const w2 = parseFloat(document.getElementById('twopt-load2').value);
+  const r1 = parseFloat(document.getElementById('twopt-raw1').textContent);
+  const r2 = parseFloat(document.getElementById('twopt-raw2').textContent);
+  
+  if ([w1, w2, r1, r2].some(x => isNaN(x))) {
+    document.getElementById('calibration-result-2pt').textContent = 'Please enter both weights and read both raw values.';
+    return;
+  }
+  
+  // Check that the two points are different
+  if (w1 === w2) {
+    document.getElementById('calibration-result-2pt').textContent = 'Error: The two known loads must be different for 2-point calibration.';
+    return;
+  }
+  
+  // Linear fit: raw = slope * weight + intercept
+  const slope = (r2 - r1) / (w2 - w1);
+  const intercept = r1 - slope * w1;
+  
+  // Store for use in main display and burning
+  window._calibSlope = slope;
+  window._calibIntercept = intercept;
+  
+  document.getElementById('calibration-result-2pt').innerHTML = 
+    `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}<br>` +
+    `Calibration ready to burn.`;
+};
+window.burn2ptCalibration = async function() {
+  const w1 = parseFloat(document.getElementById('twopt-load1').value);
+  const w2 = parseFloat(document.getElementById('twopt-load2').value);
+  const r1 = parseFloat(document.getElementById('twopt-raw1').textContent);
+  const r2 = parseFloat(document.getElementById('twopt-raw2').textContent);
+  
+  if ([w1, w2, r1, r2].some(x => isNaN(x))) {
+    alert('Please enter both weights and read both raw values before burning calibration.');
+    return;
+  }
+  
+  // Check that the two points are different
+  if (w1 === w2) {
+    alert('Error: The two known loads must be different for 2-point calibration.');
+    return;
+  }
+  
+  // Calculate linear fit: raw = slope * weight + intercept
+  const slope = (r2 - r1) / (w2 - w1);
+  const intercept = r1 - slope * w1;
+  
+  // For 2-point calibration, we use linear fit (cubic with a=b=0)
+  const CCA = 0; // No cubic term
+  const CCB = 0; // No quadratic term  
+  const CCC = slope; // Linear coefficient
+  const CCD = intercept; // Constant term
+  const FAZ = r1; // Use first raw value as offset
+  
+  try {
+    // Set NCAL mode to 1 (single direction/compression only for 2-point)
+    await writer.write(`ncal 1\r`);
+    await delay(500);
+    
+    // Send the coefficients to the sensor
+    await writer.write(`CCA ${CCA}\r`);
+    await delay(500);
+    await writer.write(`CCB ${CCB}\r`);
+    await delay(500);
+    await writer.write(`CCC ${CCC}\r`);
+    await delay(500);
+    await writer.write(`CCD ${CCD}\r`);
+    await delay(500);
+    await writer.write(`FAZ ${FAZ}\r`);
+    await delay(500);
+    
+    // Update the result display
+    document.getElementById('calibration-result-2pt').innerHTML = 
+      `2-Point Linear Calibration burned successfully!<br>` +
+      `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}<br>` +
+      `FAZ = ${FAZ.toFixed(2)}`;
+    
+    // Store for use in main display
+    window._calibSlope = slope;
+    window._calibIntercept = intercept;
+    
+    alert('2-Point calibration burned successfully!');
+  } catch (e) {
+    alert('Failed to burn 2-point calibration: ' + e);
+  }
+};
 </script>
 </body>
 </html>
+
