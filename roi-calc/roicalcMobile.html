@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iVMI ROI Calculator - Mobile</title>
+  <style>
+    /* Mobile-First ROI Calculator Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 16px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid #e9ecef;
+    }
+
+    .section h2 {
+      color: #2c3e50;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section h2::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
+      min-height: 48px; /* Larger touch target */
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .calculate-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 18px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: block;
+      width: 100%;
+      margin: 24px 0;
+      min-height: 56px; /* Larger touch target */
+    }
+
+    .calculate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .calculate-btn:active {
+      transform: translateY(0);
+    }
+
+    .results-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      text-align: center;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .results-section h2 {
+      color: #2c3e50;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .result-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .result-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .result-card h3 {
+      color: #6c757d;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .result-card .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .result-card.savings .value {
+      color: #27ae60;
+    }
+
+    .result-card.cost .value {
+      color: #e74c3c;
+    }
+
+    .result-card.roi .value {
+      color: #f39c12;
+    }
+
+    .result-card.irr .value {
+      color: #9b59b6;
+    }
+
+    .cost-breakdown-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .cost-breakdown-section h2 {
+      color: #2c3e50;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .breakdown-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .breakdown-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .breakdown-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .breakdown-card h3 {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .breakdown-card.hardware h3::before {
+      content: '🔧';
+      font-size: 1.1rem;
+    }
+
+    .breakdown-card.software h3::before {
+      content: '💻';
+      font-size: 1.1rem;
+    }
+
+    .breakdown-card.other h3::before {
+      content: '📋';
+      font-size: 1.1rem;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-size: 0.9rem;
+    }
+
+    .breakdown-item:last-of-type {
+      border-bottom: none;
+    }
+
+    .breakdown-item span:first-child {
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .breakdown-item span:last-child {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .breakdown-total {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 2px solid #e9ecef;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .projection-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .projection-section h2 {
+      color: #2c3e50;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    #projection-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      font-size: 0.85rem;
+    }
+
+    #projection-table th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    #projection-table td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 0.8rem;
+    }
+
+    #projection-table tr:hover td {
+      background: #f8f9fa;
+    }
+
+    #projection-table tr:last-child td {
+      border-bottom: none;
+      font-weight: 600;
+    }
+
+    .roi-value {
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+
+    .roi-value.positive {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .roi-value.negative {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .irr-row {
+      background: #f8f9fa;
+    }
+
+    .irr-row td {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .irr-value {
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .irr-value.positive {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .irr-value.negative {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .disclaimer {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 8px;
+      color: #856404;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .print-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+      min-height: 48px;
+    }
+
+    .print-btn:hover {
+      background: #5a6fd8;
+    }
+
+    /* Loading animation */
+    .calculate-btn.loading {
+      pointer-events: none;
+    }
+
+    .calculate-btn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Fade in animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section {
+      animation: fadeInUp 0.4s ease-out forwards;
+    }
+
+    .section:nth-child(1) { animation-delay: 0.1s; }
+    .section:nth-child(2) { animation-delay: 0.2s; }
+    .section:nth-child(3) { animation-delay: 0.3s; }
+    .section:nth-child(4) { animation-delay: 0.4s; }
+    .section:nth-child(5) { animation-delay: 0.5s; }
+    .section:nth-child(6) { animation-delay: 0.6s; }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white !important;
+        padding: 0 !important;
+      }
+      
+      .container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      
+      .calculate-btn, .print-btn {
+        display: none !important;
+      }
+    }
+
+    /* Larger screens */
+    @media (min-width: 768px) {
+      body {
+        padding: 24px;
+      }
+      
+      .container {
+        max-width: 600px;
+      }
+      
+      .header h1 {
+        font-size: 2.2rem;
+      }
+      
+      .result-card .value {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>iVMI ROI Calculator</h1>
+      <p>Calculate your return on investment</p>
+    </div>
+
+    <div class="content">
+      <section class="section">
+        <h2>Inventory Costs</h2>
+        <div class="form-group">
+          <label for="inv_count">Number of items in inventory</label>
+          <input type="number" id="inv_count" value="100">
+        </div>
+        <div class="form-group">
+          <label for="cost_per_piece">Average cost per piece ($)</label>
+          <input type="number" id="cost_per_piece" value="1" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="items_in_stock">Items kept in stock</label>
+          <input type="number" id="items_in_stock" value="100">
+        </div>
+        <div class="form-group">
+          <label for="reduction_carrying">Reduction in carrying cost (%)</label>
+          <input type="number" id="reduction_carrying" value="5" step="0.01">
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Labor</h2>
+        <div class="form-group">
+          <label for="personnel">Number of personnel</label>
+          <input type="number" id="personnel" value="5">
+        </div>
+        <div class="form-group">
+          <label for="cost_per_person">Cost per person per month ($)</label>
+          <input type="number" id="cost_per_person" value="3500">
+        </div>
+        <div class="form-group">
+          <label for="reduction_personnel">Reduction in personnel with iVMI</label>
+          <input type="number" id="reduction_personnel" value="4">
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Shrinkage & Stockouts</h2>
+        <div class="form-group">
+          <label for="shrinkage_pct">Annual shrinkage (%)</label>
+          <input type="number" id="shrinkage_pct" value="2" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="reduction_shrinkage">Reduction of shrinkage (%)</label>
+          <input type="number" id="reduction_shrinkage" value="5" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="stockouts_per_year">Stockouts per year</label>
+          <input type="number" id="stockouts_per_year" value="5">
+        </div>
+        <div class="form-group">
+          <label for="loss_per_stockout">Loss per stockout ($)</label>
+          <input type="number" id="loss_per_stockout" value="100">
+        </div>
+        <div class="form-group">
+          <label for="reduction_stockouts">Reduction of stockouts</label>
+          <input type="number" id="reduction_stockouts" value="3">
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>iVMI Hardware</h2>
+        <div class="form-group">
+          <label for="small_scale_count">Small Scales</label>
+          <input type="number" id="small_scale_count" value="40">
+        </div>
+        <div class="form-group">
+          <label for="med_scale_count">Medium Scales</label>
+          <input type="number" id="med_scale_count" value="40">
+        </div>
+        <div class="form-group">
+          <label for="large_scale_count">Large Scales</label>
+          <input type="number" id="large_scale_count" value="20">
+        </div>
+        <div class="form-group">
+          <label for="cost_router">Router unit cost ($)</label>
+          <input type="number" id="cost_router" value="499">
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>iVMI Software</h2>
+        <div class="form-group">
+          <label for="software_scale_count">Number of Scales</label>
+          <input type="number" id="software_scale_count" value="100" readonly>
+        </div>
+        <div class="form-group">
+          <label for="software_base_cost">Base License (monthly) ($)</label>
+          <input type="number" id="software_base_cost" value="500" readonly>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Other Costs</h2>
+        <div class="form-group">
+          <label for="other_cost">Installation & Misc (first year) ($)</label>
+          <input type="number" id="other_cost" value="14110">
+        </div>
+      </section>
+
+      <button class="calculate-btn" onclick="handleCalculateROIClick()">Calculate ROI</button>
+
+      <div class="results-section">
+        <h2>Results</h2>
+        <div class="result-card savings">
+          <h3>Annual Savings</h3>
+          <div class="value">$<span id="total_savings">0</span></div>
+        </div>
+        <div class="result-card cost">
+          <h3>Initial Investment</h3>
+          <div class="value">$<span id="total_cost">0</span></div>
+        </div>
+        <div class="result-card roi">
+          <h3>5-Year IRR</h3>
+          <div class="value"><span id="irr_pct">0</span>%</div>
+        </div>
+      </div>
+
+      <div class="cost-breakdown-section">
+        <h2>Cost Breakdown</h2>
+        <div class="breakdown-card hardware">
+          <h3>Hardware Costs</h3>
+          <div class="breakdown-item">
+            <span>Small Scales:</span>
+            <span id="small_scales_cost">$0</span>
+          </div>
+          <div class="breakdown-item">
+            <span>Medium Scales:</span>
+            <span id="med_scales_cost">$0</span>
+          </div>
+          <div class="breakdown-item">
+            <span>Large Scales:</span>
+            <span id="large_scales_cost">$0</span>
+          </div>
+          <div class="breakdown-item">
+            <span>Routers:</span>
+            <span id="routers_cost">$0</span>
+          </div>
+          <div class="breakdown-total">
+            <span>Total Hardware:</span>
+            <span id="total_hardware_cost">$0</span>
+          </div>
+        </div>
+
+        <div class="breakdown-card software">
+          <h3>Software Costs</h3>
+          <div class="breakdown-item">
+            <span>Base License (Annual):</span>
+            <span id="base_license_cost">$0</span>
+          </div>
+          <div class="breakdown-total">
+            <span>Total Software:</span>
+            <span id="total_software_cost">$0</span>
+          </div>
+        </div>
+
+        <div class="breakdown-card other">
+          <h3>Other Costs</h3>
+          <div class="breakdown-item">
+            <span>Installation & Misc:</span>
+            <span id="other_costs_display">$0</span>
+          </div>
+          <div class="breakdown-total">
+            <span>Total Other:</span>
+            <span id="total_other_cost">$0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="projection-section">
+        <h2>5-Year Projection</h2>
+        <table id="projection-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Savings</th>
+              <th>Cost</th>
+              <th>Net</th>
+              <th>ROI (%)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="disclaimer">
+          This estimate does not serve as a quote, please contact us at sales@stockvue.ai or (510) 274-1872 for an accurate estimate for your needs.
+        </div>
+      </div>
+
+      <button class="print-btn" onclick="window.print()">Print Summary</button>
+    </div>
+  </div>
+
+  <!-- Lead Capture Modal with Zoho Form -->
+  <div id="lead-capture-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,62,80,0.4);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:white;padding:0 0 24px 0;border-radius:16px;max-width:420px;width:95vw;box-shadow:0 8px 32px rgba(44,62,80,0.18);position:relative;display:flex;flex-direction:column;align-items:center;">
+      <button onclick="closeLeadCaptureModal()" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
+      <h2 style="font-size:1.2rem;margin:24px 0 10px 0;text-align:center;">Enter your details to continue</h2>
+      <iframe id="zoho-lead-iframe" src="https://forms.zohopublic.com/divloadsta1/form/EstimateyourROI/formperma/CrvcnKQzVmIg7KtlZDOh7EnByw7ZNsQp9nxKlZFdKQY" width="100%" height="500" frameborder="0" style="border-radius:8px;overflow:hidden;"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function calculateROI() {
+      // Add loading state to button
+      const button = document.querySelector('.calculate-btn');
+      button.classList.add('loading');
+      button.textContent = 'Calculating...';
+      
+      // Simulate a small delay for better UX
+      setTimeout(() => {
+        performCalculation();
+        button.classList.remove('loading');
+        button.textContent = 'Calculate ROI';
+        
+        // Scroll to results after calculation
+        setTimeout(scrollToResults, 300);
+      }, 800);
+    }
+
+    function handleCalculateROIClick() {
+      if (window.leadCaptured) {
+        calculateROI();
+      } else {
+        openLeadCaptureModal();
+      }
+    }
+
+    function performCalculation() {
+      // Inputs
+      const inv_count = parseFloat(document.getElementById('inv_count').value);
+      const cost_per_piece = parseFloat(document.getElementById('cost_per_piece').value);
+      const items_in_stock = parseFloat(document.getElementById('items_in_stock').value);
+      const reduction_carrying = parseFloat(document.getElementById('reduction_carrying').value) / 100;
+
+      const personnel = parseFloat(document.getElementById('personnel').value);
+      const cost_per_person = parseFloat(document.getElementById('cost_per_person').value);
+      const reduction_personnel = parseFloat(document.getElementById('reduction_personnel').value);
+
+      const shrinkage_pct = parseFloat(document.getElementById('shrinkage_pct').value) / 100;
+      const reduction_shrinkage = parseFloat(document.getElementById('reduction_shrinkage').value) / 100;
+
+      const stockouts_per_year = parseFloat(document.getElementById('stockouts_per_year').value);
+      const loss_per_stockout = parseFloat(document.getElementById('loss_per_stockout').value);
+      const reduction_stockouts = parseFloat(document.getElementById('reduction_stockouts').value);
+
+      const cost_small_scale = 249; // Hardcoded small scale cost
+      const cost_med_scale = 349; // Hardcoded medium scale cost
+      const cost_large_scale = 549; // Hardcoded large scale cost
+      const router_markup = 1.2; // Hardcoded router markup factor
+      const cost_router = parseFloat(document.getElementById('cost_router').value);
+
+      const other_cost = parseFloat(document.getElementById('other_cost').value);
+
+      // Software costs
+      const software_base_cost = parseFloat(document.getElementById('software_base_cost').value);
+
+      // Calculations
+      const averageInventory = items_in_stock * cost_per_piece * inv_count;
+      const annualInventory = averageInventory * 12;
+      const savingsCarrying = annualInventory * reduction_carrying;
+
+      const savingsLabor = (personnel - reduction_personnel) * 12 * cost_per_person;
+
+      const shrinkageLoss = annualInventory * shrinkage_pct;
+      const savingsShrinkage = shrinkageLoss * reduction_shrinkage * -1;
+
+      const savingsStockoutLoss = (loss_per_stockout * stockouts_per_year) * -1;
+      const savingsStockouts = (loss_per_stockout * reduction_stockouts) * -1;
+
+      const totalSavings = savingsCarrying + savingsLabor + savingsShrinkage + savingsStockoutLoss + savingsStockouts;
+
+      // Hardware cost
+      const smallCount = parseFloat(document.getElementById('small_scale_count').value);
+      const medCount = parseFloat(document.getElementById('med_scale_count').value);
+      const largeCount = parseFloat(document.getElementById('large_scale_count').value);
+      const numberScales = smallCount + medCount + largeCount;
+
+      const costSmallTotal = smallCount * cost_small_scale;
+      const costMedTotal = medCount * cost_med_scale;
+      const costLargeTotal = largeCount * cost_large_scale;
+      const routersNeeded = numberScales / 12 * router_markup;
+      const costRouterTotal = routersNeeded * cost_router;
+
+      const totalHardwareCost = costSmallTotal + costMedTotal + costLargeTotal + costRouterTotal;
+
+      // Software cost calculation (recurring)
+      const softwareScaleCount = parseFloat(document.getElementById('software_scale_count').value);
+      const monthlySoftwareCost = Math.max(software_base_cost, softwareScaleCount * 1);
+      const annualSoftwareCost = monthlySoftwareCost * 12;
+
+      // Total costs
+      const year1Cost = totalHardwareCost + annualSoftwareCost + other_cost;
+      const ongoingCost = annualSoftwareCost;
+
+      // Calculate 5-year IRR
+      const irr = calculateIRR(totalSavings, year1Cost, ongoingCost);
+
+      // Update results with animation
+      animateNumber('total_savings', totalSavings);
+      animateNumber('total_cost', year1Cost);
+      animateNumber('irr_pct', irr * 100);
+
+      // Update cost breakdown
+      updateCostBreakdown(
+        costSmallTotal, costMedTotal, costLargeTotal, costRouterTotal, totalHardwareCost,
+        annualSoftwareCost, other_cost
+      );
+
+      // 5-Year Projection
+      updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr);
+    }
+
+    // Calculate IRR using Newton-Raphson method
+    function calculateIRR(annualSavings, initialCost, ongoingCost) {
+      const cashFlows = [
+        -initialCost, // Year 0: Initial investment (negative)
+        annualSavings - ongoingCost, // Year 1: Net cash flow
+        annualSavings - ongoingCost, // Year 2: Net cash flow
+        annualSavings - ongoingCost, // Year 3: Net cash flow
+        annualSavings - ongoingCost, // Year 4: Net cash flow
+        annualSavings - ongoingCost  // Year 5: Net cash flow
+      ];
+
+      // Newton-Raphson method to find IRR
+      let guess = 0.1; // Start with 10% guess
+      const tolerance = 0.0001;
+      const maxIterations = 100;
+
+      for (let i = 0; i < maxIterations; i++) {
+        const npv = calculateNPV(cashFlows, guess);
+        const derivative = calculateNPVDerivative(cashFlows, guess);
+        
+        if (Math.abs(derivative) < tolerance) {
+          break; // Avoid division by zero
+        }
+        
+        const newGuess = guess - npv / derivative;
+        
+        if (Math.abs(newGuess - guess) < tolerance) {
+          guess = newGuess;
+          break;
+        }
+        
+        guess = newGuess;
+      }
+
+      // Validate IRR is reasonable (between -100% and 1000%)
+      if (guess < -1 || guess > 10) {
+        return 0; // Return 0% if IRR is unreasonable
+      }
+
+      return guess;
+    }
+
+    // Calculate Net Present Value
+    function calculateNPV(cashFlows, rate) {
+      let npv = 0;
+      for (let i = 0; i < cashFlows.length; i++) {
+        npv += cashFlows[i] / Math.pow(1 + rate, i);
+      }
+      return npv;
+    }
+
+    // Calculate derivative of NPV (for Newton-Raphson)
+    function calculateNPVDerivative(cashFlows, rate) {
+      let derivative = 0;
+      for (let i = 1; i < cashFlows.length; i++) {
+        derivative -= i * cashFlows[i] / Math.pow(1 + rate, i + 1);
+      }
+      return derivative;
+    }
+
+    function animateNumber(elementId, targetValue) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      
+      const startValue = parseFloat(element.innerText) || 0;
+      const duration = 1000; // 1 second
+      const startTime = performance.now();
+      
+      function updateNumber(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentValue = startValue + (targetValue - startValue) * easeOutQuart;
+        
+        if (elementId === 'irr_pct') {
+          element.innerText = currentValue.toFixed(2);
+        } else {
+          element.innerText = formatCurrency(currentValue);
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateNumber);
+        }
+      }
+      
+      requestAnimationFrame(updateNumber);
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function updateCostBreakdown(
+      smallScalesCost, medScalesCost, largeScalesCost, routersCost, totalHardwareCost,
+      totalSoftwareCost, otherCost
+    ) {
+      // Update hardware costs
+      document.getElementById('small_scales_cost').textContent = `$${formatCurrency(smallScalesCost)}`;
+      document.getElementById('med_scales_cost').textContent = `$${formatCurrency(medScalesCost)}`;
+      document.getElementById('large_scales_cost').textContent = `$${formatCurrency(largeScalesCost)}`;
+      document.getElementById('routers_cost').textContent = `$${formatCurrency(routersCost)}`;
+      document.getElementById('total_hardware_cost').textContent = `$${formatCurrency(totalHardwareCost)}`;
+
+      // Update software costs
+      document.getElementById('base_license_cost').textContent = `$${formatCurrency(totalSoftwareCost)}`;
+      document.getElementById('total_software_cost').textContent = `$${formatCurrency(totalSoftwareCost)}`;
+
+      // Update other costs
+      document.getElementById('other_costs_display').textContent = `$${formatCurrency(otherCost)}`;
+      document.getElementById('total_other_cost').textContent = `$${formatCurrency(otherCost)}`;
+    }
+
+    function updateProjectionTable(totalSavings, year1Cost, ongoingCost, irr) {
+      const tbody = document.querySelector('#projection-table tbody');
+      tbody.innerHTML = '';
+      
+      for (let year = 1; year <= 5; year++) {
+        const cost = year === 1 ? year1Cost : ongoingCost;
+        const net = totalSavings - cost;
+        const roi = (net / year1Cost) * 100;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${year}</td>
+          <td>$${formatCurrency(totalSavings)}</td>
+          <td>$${formatCurrency(cost)}</td>
+          <td>$${formatCurrency(net)}</td>
+          <td class="roi-value ${roi >= 0 ? 'positive' : 'negative'}">${roi.toFixed(2)}%</td>
+        `;
+        tbody.appendChild(row);
+      }
+      
+      // Add IRR row
+      const irrRow = document.createElement('tr');
+      irrRow.className = 'irr-row';
+      irrRow.innerHTML = `
+        <td colspan="4"><strong>5-Year IRR</strong></td>
+        <td class="irr-value ${irr >= 0 ? 'positive' : 'negative'}">${(irr * 100).toFixed(2)}%</td>
+      `;
+      tbody.appendChild(irrRow);
+    }
+
+    // Auto-update software scale count when hardware counts change
+    document.addEventListener('DOMContentLoaded', function() {
+      function updateSoftwareScaleCount() {
+        const smallCount = parseFloat(document.getElementById('small_scale_count').value) || 0;
+        const medCount = parseFloat(document.getElementById('med_scale_count').value) || 0;
+        const largeCount = parseFloat(document.getElementById('large_scale_count').value) || 0;
+        const totalScales = smallCount + medCount + largeCount;
+        
+        document.getElementById('software_scale_count').value = totalScales;
+        // Auto-update software_base_cost: max(500, totalScales * 1)
+        document.getElementById('software_base_cost').value = Math.max(500, totalScales * 1);
+      }
+
+      // Add event listeners to hardware count inputs
+      document.getElementById('small_scale_count').addEventListener('input', updateSoftwareScaleCount);
+      document.getElementById('med_scale_count').addEventListener('input', updateSoftwareScaleCount);
+      document.getElementById('large_scale_count').addEventListener('input', updateSoftwareScaleCount);
+      
+      // Initial update
+      updateSoftwareScaleCount();
+    });
+
+    function scrollToResults() {
+      const resultsSection = document.querySelector('.results-section');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Lead Capture Modal Logic (iframe version)
+    document.addEventListener('DOMContentLoaded', function() {
+      window.leadCaptured = false;
+      window.openLeadCaptureModal = function() {
+        document.getElementById('lead-capture-modal').style.display = 'flex';
+        // Reset iframe (in case user opens modal again)
+        document.getElementById('zoho-lead-iframe').src = 'https://forms.zohopublic.com/divloadsta1/form/EstimateyourROI/formperma/CrvcnKQzVmIg7KtlZDOh7EnByw7ZNsQp9nxKlZFdKQY';
+      }
+      window.closeLeadCaptureModal = function() {
+        document.getElementById('lead-capture-modal').style.display = 'none';
+        window.leadCaptured = true;
+      }
+    });
+
+    // Detect Zoho form submission via URL hash
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.location.hash === '#zoho_submitted') {
+        window.leadCaptured = true;
+        window.closeLeadCaptureModal && window.closeLeadCaptureModal();
+        setTimeout(function() {
+          calculateROI();
+        }, 200);
+      }
+    });
+  </script>
+</body>
+</html> 
