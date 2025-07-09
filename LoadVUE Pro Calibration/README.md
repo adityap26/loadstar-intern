@@ -53,18 +53,12 @@ A comprehensive web-based calibration utility for LoadVUE Pro sensors, providing
 
 ## 📋 Installation & Setup
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/yourusername/loadstar-intern.git
-cd loadstar-intern
-```
-
-### 2. Open the Application
+### 1. Open the Application
 - Navigate to the `LoadVUE Pro Calibration/` directory
 - Open `index.html` in a compatible web browser
 - Ensure the browser supports Web Serial API
 
-### 3. Connect to Sensor
+### 2. Connect to Sensor
 1. Click "Connect Serial Port" button
 2. Select your LoadVUE Pro sensor from the port list
 3. Verify connection status in the top banner
