@@ -299,6 +299,77 @@
     .specs-burn-btn {
         width: 80px;
     }
+    #reading-controls-column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+      min-width: 200px;
+      max-width: 220px;
+      padding: 24px 18px 24px 18px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #e0e0e0;
+      margin-top: 0;
+      margin-bottom: 0;
+      height: fit-content;
+    }
+    #reading-controls-column .horizontal-align {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+      background: none !important;
+    }
+    #reading-controls-column label.value-label {
+      min-width: 70px;
+      font-size: 15px;
+      color: #222;
+      margin-right: 8px;
+      text-align: left;
+      background: none !important;
+    }
+    #reading-controls-column select {
+      width: 90px;
+      height: 28px;
+      font-size: 15px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      background: #fff;
+      color: #222;
+      padding-left: 6px;
+    }
+    #reading-controls-column #peak-value,
+    #reading-controls-column #low-value {
+      width: 90px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-left: 0;
+      margin-top: 0;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      background: #000;
+    }
+    /* Tab Bar: Calibration Utility Tabs */
+    .calib-tab-btn {
+      padding: 8px 18px;
+      border-radius: 6px 6px 0 0;
+      border: none;
+      background: #007BC6;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.18s, color 0.18s;
+    }
+    .calib-tab-btn.active-tab {
+      background: #fff;
+      color: #007BC6;
+    }
 </style>
 </head>
 <body>
@@ -315,11 +386,11 @@
     <h2 style="margin-bottom: 10px;">Calibration Utility</h2>
     <!-- Tab Bar: Add Verify Calibration as fourth tab -->
     <div id="calib-tabs" style="display: flex; gap: 8px; margin-bottom: 18px;">
-      <button class="calib-tab-btn" data-tab="specs" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Specifications</button>
-      <button class="calib-tab-btn" data-tab="2pt" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">2-Point Calibration</button>
-      <button class="calib-tab-btn" data-tab="multi" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Multi-Point Calibration</button>
-      <button class="calib-tab-btn" data-tab="verify" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Verify Calibration</button>
-      <button class="calib-tab-btn" data-tab="data" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Data</button>
+      <button class="calib-tab-btn" data-tab="specs">Specifications</button>
+      <button class="calib-tab-btn" data-tab="2pt">2-Point Calibration</button>
+      <button class="calib-tab-btn" data-tab="multi">Multi-Point Calibration</button>
+      <button class="calib-tab-btn" data-tab="verify">Verify Calibration</button>
+      <button class="calib-tab-btn" data-tab="data">Data</button>
     </div>
     <!-- Tab Contents -->
     <div id="calib-tab-content-specs" class="calib-tab-content">
@@ -372,41 +443,45 @@
         4. Click "Burn Calibration" to save to sensor<br>
         5. Click "Verify Calibration" to verify the calibration
       </div>
-      <table id="twopt-calibration-table" style="width: 100%; max-width: 400px; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed; margin-bottom: 10px;">
-        <thead>
-          <tr>
-            <th style="width: 30px; text-align: center;">#</th>
-            <th style="width: 100px; text-align: center;">Known Load</th>
-            <th style="width: 100px; text-align: center;">Raw Value</th>
-            <th style="width: 70px; text-align: center;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="text-align: center;">1</td>
-            <td style="text-align: center;">
-              <input type="number" id="twopt-load1" style="width: 80px; height: 22px; font-size: 14px; text-align: center;" placeholder="Enter">
-            </td>
-            <td id="twopt-raw1" style="text-align: center;">---</td>
-            <td style="display: flex; align-items: center; justify-content: center;">
-              <button onclick="read2ptRaw(1)" class="burn-btn" style="width: 60px; height: 22px; font-size: 13px;">Capture</button>
-            </td>
-          </tr>
-          <tr>
-            <td style="text-align: center;">2</td>
-            <td style="text-align: center;">
-              <input type="number" id="twopt-load2" style="width: 80px; height: 22px; font-size: 14px; text-align: center;" placeholder="Enter">
-            </td>
-            <td id="twopt-raw2" style="text-align: center;">---</td>
-            <td style="display: flex; align-items: center; justify-content: center;">
-              <button onclick="read2ptRaw(2)" class="burn-btn" style="width: 60px; height: 22px; font-size: 13px;">Capture</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button onclick="calculate2ptCalibration()" class="burn-btn" style="width: 180px;">Calculate Calibration</button>
-      <button onclick="burn2ptCalibration()" class="burn-btn" style="width: 180px;">Burn Calibration</button>
-      <div id="calibration-result-2pt" style="margin-top: 8px; font-size: 15px;"></div>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; max-width: 480px; margin: 0 auto 0 0; padding: 0;">
+        <table id="twopt-calibration-table" style="width: 100%; border-collapse: collapse; background-color: #007BC6; table-layout: fixed; margin-bottom: 12px; border-radius: 0; box-shadow: none;">
+          <thead>
+            <tr style="background: #007BC6; color: #000; border-radius: 0; font-weight: bold;">
+              <th style="width: 30px; text-align: center; border-radius: 0;">#</th>
+              <th style="width: 120px; text-align: center; border-radius: 0; font-weight: bold;">Known Load</th>
+              <th style="width: 120px; text-align: center; border-radius: 0; font-weight: bold;">Raw Value</th>
+              <th style="width: 90px; text-align: center; border-radius: 0; font-weight: bold;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center;">1</td>
+              <td style="text-align: center;">
+                <input type="number" id="twopt-load1" style="width: 100px; height: 28px; font-size: 15px; text-align: center; border: 1.5px solid #888; border-radius: 0; background: #fff; margin: 0 auto;" placeholder="Enter">
+              </td>
+              <td id="twopt-raw1" style="text-align: center;">---</td>
+              <td style="text-align: center;">
+                <button onclick="read2ptRaw(1)" class="burn-btn" style="border-radius: 0;">Capture</button>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center;">2</td>
+              <td style="text-align: center;">
+                <input type="number" id="twopt-load2" style="width: 100px; height: 28px; font-size: 15px; text-align: center; border: 1.5px solid #888; border-radius: 0; background: #fff; margin: 0 auto;" placeholder="Enter">
+              </td>
+              <td id="twopt-raw2" style="text-align: center;">---</td>
+              <td style="text-align: center;">
+                <button onclick="read2ptRaw(2)" class="burn-btn" style="border-radius: 0;">Capture</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="display: flex; flex-direction: row; justify-content: center; gap: 12px; width: 100%; margin-top: 0;">
+          <button onclick="calculate2ptCalibration()" class="burn-btn" style="width: 200px; border-radius: 0;">Calculate Calibration</button>
+          <button onclick="burn2ptCalibration()" class="burn-btn" style="width: 200px; border-radius: 0;">Burn Calibration</button>
+        </div>
+      </div>
+      <div id="calibration-result-2pt" style="margin-top: 12px; font-size: 15px;"></div>
     </div>
     <div id="calib-tab-content-multi" class="calib-tab-content" style="display:none; padding-bottom: 60px;">
       <!-- Multi-Point Calibration Tab Content (with both directions) -->
@@ -423,7 +498,7 @@
         </div>
         <div style="width: 100%; display: flex; justify-content: center; margin-top: 18px;">
           <button id="calib-plot-toggle" class="burn-btn" style="height: 56px; min-width: 160px; font-size: 24px; background: #007BC6; color: #fff; border-radius: 6px; border: none;">Start</button>
-          <button id="calib-plot-clear" class="burn-btn" style="height: 56px; min-width: 120px; font-size: 24px; background: #d9534f; color: #fff; border-radius: 6px; border: none; margin-left: 12px;">Clear</button>
+          <button id="calib-plot-clear" class="burn-btn" style="height: 56px; min-width: 160px; font-size: 24px; background: #d9534f; color: #fff; border-radius: 6px; border: none; margin-left: 12px;">Clear</button>
         </div>
       </div>
       <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
@@ -456,45 +531,44 @@
     <!-- Verify Calibration Tab Content (hidden by default) -->
     <div id="calib-tab-content-verify" class="calib-tab-content" style="display:none;">
       <div id="middle" style="margin-top:10px;">
-        <div id="reading-content">
-          <div id="outputReading" class="outputBox"></div>   
-        </div>
-        <!-- New row for controls and Peak/Low -->
-        <div id="reading-controls-row" style="display: flex; flex-direction: row; align-items: center; gap: 32px; margin-top: 8px; margin-bottom: 8px; width: 100%;">
-          <div class="horizontal-align">
-            <label class="value-label">Resolution:</label>
-            <select id="resolutionSelect" onchange="return updateResolution()">
-              <option value="0">x</option>
-              <option value="1">x.x</option>
-              <option value="2" selected>x.xx</option>
-            </select>
-          </div>
-          <div class="horizontal-align">
-            <label class="value-label">Units:</label>
-            <select id="unitSelect" onchange="updateUnits()">
-              <option value="lb">lb</option>
-              <option value="kg">kg</option>
-              <option value="g">g</option>
-              <option value="N">N</option>
-            </select>
-          </div>
-          <div class="horizontal-align">
-            <label class="value-label">Average:</label>
-            <select id="averageReading" onchange="averageReading()">
-              <option value="1">1</option>
-              <option value="10">10</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-          <!-- Peak/Low moved here -->
-          <div class="horizontal-align" style="margin-left: 32px;">
-            <div class="value-label" style="font-size: 14px;">Peak:</div>
-            <div id="peak-value" style="background-color: #000000; color: #0000FF; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
-          </div>
-          <div class="horizontal-align">
-            <div class="value-label" style="font-size: 14px;">Low:</div>
-            <div id="low-value" style="background-color: #000000; color: #FF0000; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
+        <div id="reading-content" style="display: flex; flex-direction: row; align-items: flex-start; gap: 32px;">
+          <div id="outputReading" class="outputBox"></div>
+          <!-- Controls column -->
+          <div id="reading-controls-column" style="display: flex; flex-direction: column; align-items: flex-start; gap: 18px; min-width: 200px; max-width: 220px; padding: 24px 18px 24px 18px; background: #f7f7f7; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; margin-top: 0; margin-bottom: 0; height: fit-content;">
+            <div class="horizontal-align" style="width: 100%; display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0;">
+              <label class="value-label" style="min-width: 70px; font-size: 15px; color: #222; margin-right: 8px; text-align: left;">Resolution:</label>
+              <select id="resolutionSelect" onchange="return updateResolution()" style="width: 90px; height: 28px; font-size: 15px; border-radius: 4px; border: 1px solid #bbb; background: #fff; color: #222; padding-left: 6px;">
+                <option value="0">x</option>
+                <option value="1">x.x</option>
+                <option value="2" selected>x.xx</option>
+              </select>
+            </div>
+            <div class="horizontal-align" style="width: 100%; display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0;">
+              <label class="value-label" style="min-width: 70px; font-size: 15px; color: #222; margin-right: 8px; text-align: left;">Units:</label>
+              <select id="unitSelect" onchange="updateUnits()" style="width: 90px; height: 28px; font-size: 15px; border-radius: 4px; border: 1px solid #bbb; background: #fff; color: #222; padding-left: 6px;">
+                <option value="lb">lb</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="N">N</option>
+              </select>
+            </div>
+            <div class="horizontal-align" style="width: 100%; display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0;">
+              <label class="value-label" style="min-width: 70px; font-size: 15px; color: #222; margin-right: 8px; text-align: left;">Average:</label>
+              <select id="averageReading" onchange="averageReading()" style="width: 90px; height: 28px; font-size: 15px; border-radius: 4px; border: 1px solid #bbb; background: #fff; color: #222; padding-left: 6px;">
+                <option value="1">1</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="horizontal-align" style="width: 100%; display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0; background: none !important;">
+              <div class="value-label" style="min-width: 70px; font-size: 15px; color: #222; margin-right: 8px; text-align: left; background: none !important;">Peak:</div>
+              <div id="peak-value" style="background-color: #000000; color: #0000FF; font-size: 16px; width: 90px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 0; margin-top: 0; border-radius: 4px; border: 1px solid #bbb;">N/A</div>
+            </div>
+            <div class="horizontal-align" style="width: 100%; display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0; background: none !important;">
+              <div class="value-label" style="min-width: 70px; font-size: 15px; color: #222; margin-right: 8px; text-align: left; background: none !important;">Low:</div>
+              <div id="low-value" style="background-color: #000000; color: #FF0000; font-size: 16px; width: 90px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 0; margin-top: 0; border-radius: 4px; border: 1px solid #bbb;">N/A</div>
+            </div>
           </div>
         </div>
       </div>
@@ -540,8 +614,10 @@
   function showTab(tab) {
     document.querySelectorAll('.calib-tab-content').forEach(el => el.style.display = 'none');
     document.getElementById('calib-tab-content-' + tab).style.display = 'block';
-    document.querySelectorAll('.calib-tab-btn').forEach(btn => btn.style.background = '#e0e0e0');
-    document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').style.background = '#fff';
+    document.querySelectorAll('.calib-tab-btn').forEach(btn => {
+      btn.classList.remove('active-tab');
+    });
+    document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').classList.add('active-tab');
     // If switching to verify, (re)initialize chart if needed
     if(tab === 'verify') {
       if(window.chart && window.chart.data) {
@@ -1354,8 +1430,9 @@ function renderCalibrationTable() {
     btnCompRead.onclick = () => readCalibrationRaw(idx+1, 'compression');
     tdCompRead.appendChild(btnCompRead);
     // Add button (only on last row)
+    let btnAdd, btnRemove;
     if (idx === calibrationPointsCompression.length - 1) {
-      const btnAdd = document.createElement('button');
+      btnAdd = document.createElement('button');
       btnAdd.textContent = '+';
       btnAdd.title = 'Add row';
       btnAdd.style.color = 'white';
@@ -1365,11 +1442,9 @@ function renderCalibrationTable() {
       btnAdd.style.fontSize = '13px';
       btnAdd.style.marginLeft = '6px';
       btnAdd.onclick = () => addCalibrationRow('compression');
-      tdCompRead.appendChild(btnAdd);
     }
-    // Remove button (if more than min rows)
     if (calibrationPointsCompression.length > MIN_CALIB_ROWS && calibrationPointsTension.length > MIN_CALIB_ROWS) {
-      const btnRemove = document.createElement('button');
+      btnRemove = document.createElement('button');
       btnRemove.textContent = '✕';
       btnRemove.title = 'Remove row';
       btnRemove.style.color = 'white';
@@ -1379,8 +1454,10 @@ function renderCalibrationTable() {
       btnRemove.style.fontSize = '15px';
       btnRemove.style.marginLeft = '6px';
       btnRemove.onclick = () => removeCalibrationRow(idx);
-      tdCompRead.appendChild(btnRemove);
     }
+    // Append in new order: X then +
+    if (btnRemove) tdCompRead.appendChild(btnRemove);
+    if (btnAdd) tdCompRead.appendChild(btnAdd);
     tr.appendChild(tdCompRead);
     // Tension Row Number
     const tdTenNum = document.createElement('td');
@@ -1399,7 +1476,7 @@ function renderCalibrationTable() {
     inputTenLoad.placeholder = 'Enter';
     inputTenLoad.value = calibrationPointsTension[idx]?.weight ?? '';
     inputTenLoad.onchange = (e) => { calibrationPointsTension[idx].weight = parseFloat(e.target.value); };
-    if (ncalMode === 1) { inputTenLoad.disabled = true; inputTenLoad.style.background = '#eee'; }
+    if (ncalMode === 1) inputTenLoad.disabled = true; inputTenLoad.style.background = '#eee';
     tdTenLoad.appendChild(inputTenLoad);
     tr.appendChild(tdTenLoad);
     // Tension Raw
@@ -1407,7 +1484,7 @@ function renderCalibrationTable() {
     tdTenRaw.id = `ten-raw-${idx+1}`;
     tdTenRaw.style.textAlign = 'center';
     tdTenRaw.textContent = calibrationPointsTension[idx]?.raw !== undefined && calibrationPointsTension[idx]?.raw !== null ? calibrationPointsTension[idx].raw.toFixed(2) : '---';
-    if (ncalMode === 1) { tdTenRaw.style.background = '#eee'; }
+    if (ncalMode === 1) tdTenRaw.style.background = '#eee';
     tr.appendChild(tdTenRaw);
     // Tension Read + Add/Remove
     const tdTenRead = document.createElement('td');
@@ -1420,36 +1497,42 @@ function renderCalibrationTable() {
     btnTenRead.style.height = '22px';
     btnTenRead.style.fontSize = '13px';
     btnTenRead.onclick = () => readCalibrationRaw(idx+1, 'tension');
-    if (ncalMode === 1) { btnTenRead.disabled = true; btnTenRead.style.background = '#eee'; }
+    if (ncalMode === 1) {
+      btnTenRead.disabled = true;
+      btnTenRead.style.background = '#eee';
+    } else {
+      btnTenRead.style.backgroundColor = '#007BC6'; // Make blue when enabled
+    }
     tdTenRead.appendChild(btnTenRead);
     // Add button (only on last row)
+    let btnAddTen, btnRemoveTen;
     if (idx === calibrationPointsTension.length - 1) {
-      const btnAdd = document.createElement('button');
-      btnAdd.textContent = '+';
-      btnAdd.title = 'Add row';
-      btnAdd.style.color = 'white';
-      btnAdd.style.backgroundColor = '#007BC6';
-      btnAdd.style.width = '25px';
-      btnAdd.style.height = '22px';
-      btnAdd.style.fontSize = '13px';
-      btnAdd.style.marginLeft = '6px';
-      btnAdd.onclick = () => addCalibrationRow('tension');
-      if (ncalMode !== 1) tdTenRead.appendChild(btnAdd);
+      btnAddTen = document.createElement('button');
+      btnAddTen.textContent = '+';
+      btnAddTen.title = 'Add row';
+      btnAddTen.style.color = 'white';
+      btnAddTen.style.backgroundColor = '#007BC6';
+      btnAddTen.style.width = '25px';
+      btnAddTen.style.height = '22px';
+      btnAddTen.style.fontSize = '13px';
+      btnAddTen.style.marginLeft = '6px';
+      btnAddTen.onclick = () => addCalibrationRow('tension');
     }
-    // Remove button (if more than min rows)
     if (calibrationPointsCompression.length > MIN_CALIB_ROWS && calibrationPointsTension.length > MIN_CALIB_ROWS) {
-      const btnRemove = document.createElement('button');
-      btnRemove.textContent = '✕';
-      btnRemove.title = 'Remove row';
-      btnRemove.style.color = 'white';
-      btnRemove.style.backgroundColor = '#d9534f';
-      btnRemove.style.width = '28px';
-      btnRemove.style.height = '22px';
-      btnRemove.style.fontSize = '15px';
-      btnRemove.style.marginLeft = '6px';
-      btnRemove.onclick = () => removeCalibrationRow(idx);
-      if (ncalMode !== 1) tdTenRead.appendChild(btnRemove);
+      btnRemoveTen = document.createElement('button');
+      btnRemoveTen.textContent = '✕';
+      btnRemoveTen.title = 'Remove row';
+      btnRemoveTen.style.color = 'white';
+      btnRemoveTen.style.backgroundColor = '#d9534f';
+      btnRemoveTen.style.width = '28px';
+      btnRemoveTen.style.height = '22px';
+      btnRemoveTen.style.fontSize = '15px';
+      btnRemoveTen.style.marginLeft = '6px';
+      btnRemoveTen.onclick = () => removeCalibrationRow(idx);
     }
+    // Append in new order: X then +
+    if (ncalMode !== 1 && btnRemoveTen) tdTenRead.appendChild(btnRemoveTen);
+    if (ncalMode !== 1 && btnAddTen) tdTenRead.appendChild(btnAddTen);
     tr.appendChild(tdTenRead);
     tbody.appendChild(tr);
   }
@@ -1947,8 +2030,10 @@ readCalibrationRaw = async function(idx, direction) {
   function showTab(tab) {
     document.querySelectorAll('.calib-tab-content').forEach(el => el.style.display = 'none');
     document.getElementById('calib-tab-content-' + tab).style.display = 'block';
-    document.querySelectorAll('.calib-tab-btn').forEach(btn => btn.style.background = '#e0e0e0');
-    document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').style.background = '#fff';
+    document.querySelectorAll('.calib-tab-btn').forEach(btn => {
+      btn.classList.remove('active-tab');
+    });
+    document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').classList.add('active-tab');
     // If switching to verify, (re)initialize chart if needed
     if(tab === 'verify') {
       if(window.chart && window.chart.data) {
