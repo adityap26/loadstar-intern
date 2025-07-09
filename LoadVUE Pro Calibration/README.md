@@ -54,8 +54,7 @@ A comprehensive web-based calibration utility for LoadVUE Pro sensors, providing
 ## 📋 Installation & Setup
 
 ### 1. Open the Application
-- Navigate to the `LoadVUE Pro Calibration/` directory
-- Open `index.html` in a compatible web browser
+- Open provided LoadVUE Calibration Tool link in a compatible web browser
 - Ensure the browser supports Web Serial API
 
 ### 2. Connect to Sensor
