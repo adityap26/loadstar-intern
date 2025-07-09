@@ -278,83 +278,23 @@
 </head>
 <body>
 <div class="horizontal-container" id="topBanner"> 
-    <label class="Header_Title" for="ProductName">LoadVUE Pro Cloud - Single Channel Display</label>
+    <label class="Header_Title" for="ProductName">LoadVUE Pro Cloud - Calibration App</label>
     <button id="connect" onclick="connectSerial()" style="margin-right: 98px;height: 36px;font-size: 18px;" class="button">Connect Serial Port</button>
     <button id="disconnect" style="display: none;margin-right: 98px;height: 36px;font-size: 18px;" onclick="disconnectSerial()" class="button">Disconnect</button>
     <img class="right" src="images/loadstar_sensors_logo.png">
 </div>
-<div id="middle" style="margin-top:10px;">
-    <div id="reading-content">
-        <div id="outputReading" class="outputBox"></div>   
-    </div>
-    <!-- New row for controls and Peak/Low -->
-    <div id="reading-controls-row" style="display: flex; flex-direction: row; align-items: center; gap: 32px; margin-top: 8px; margin-bottom: 8px; width: 100%;">
-        <div class="horizontal-align">
-            <label class="value-label">Resolution:</label>
-            <select id="resolutionSelect" onchange="return updateResolution()">
-                <option value="0">x</option>
-                <option value="1">x.x</option>
-                <option value="2" selected>x.xx</option>
-            </select>
-        </div>
-        <div class="horizontal-align">
-            <label class="value-label">Units:</label>
-            <select id="unitSelect" onchange="updateUnits()">
-                <option value="lb">lb</option>
-                <option value="kg">kg</option>
-                <option value="g">g</option>
-                <option value="N">N</option>
-            </select>
-        </div>
-        <div class="horizontal-align">
-            <label class="value-label">Average:</label>
-            <select id="averageReading" onchange="averageReading()">
-                <option value="1">1</option>
-                <option value="10">10</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </div>
-        <!-- Peak/Low moved here -->
-        <div class="horizontal-align" style="margin-left: 32px;">
-            <div class="value-label" style="font-size: 14px;">Peak:</div>
-            <div id="peak-value" style="background-color: #000000; color: #0000FF; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
-        </div>
-        <div class="horizontal-align">
-            <div class="value-label" style="font-size: 14px;">Low:</div>
-            <div id="low-value" style="background-color: #000000; color: #FF0000; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
-        </div>
-    </div>
-</div>
-<div class="button-container" style="margin-top:5px;">
-    <button id="tare"  onclick="tare()" style="color:white; width:49%; height: 25px;display: none;">Tare</button>
-    <button id="read" onclick="showReading()" style="color:white; width: 49%; height: 25px; display: none;">Read</button>
-    <button id="stop" onclick="stopReading()" style="color:white; width: 49%; height: 25px; display: none;">Stop</button>
-</div>
 
-<!-- Force Vs Time Plot -->
-
-<div style="margin-top:10px; margin-bottom: 10px; font-size: 14; font-weight: bold;">
-    Force vs Time Plot:&nbsp;<span id="graphtype" style="text-transform: capitalize;"></span></div>
-<div style="display: flex; flex-direction: column; width: 100%;">
-    <div id="graph-container" style="width: 100%; height: 30vh;">
-        <canvas id="dataChart" style="width: 100%; height: 100%;"></canvas>
-    </div>  
-    <!-- New row for Cumulative/Strip Chart buttons -->
-    <div id="chart-controls-row" style="display: flex; flex-direction: row; gap: 10px; margin-top: 10px; width: 100%;">
-        <button onclick="showCumulativeGraph()" style="color:white; width: 160px; height: 28px;">Cumulative</button>
-        <button onclick="showRecentGraph()" style="color:white; width: 160px; height: 28px;">Strip Chart</button>
-    </div>
-</div>
-<!-- Calibration Utility always visible under the Force vs Time Plot -->
+<!-- Calibration Utility always visible -->
 <div id="calibration-section" style="width: 100%; background: none; padding: 0; border-radius: 0; max-width: 100%; min-width: 0; margin: 0; position: relative;">
   <div id="calibration-modal-body">
     <h2 style="margin-bottom: 10px;">Calibration Utility</h2>
-    <!-- Tab Bar -->
+    <!-- Tab Bar: Add Verify Calibration as fourth tab -->
     <div id="calib-tabs" style="display: flex; gap: 8px; margin-bottom: 18px;">
       <button class="calib-tab-btn" data-tab="specs" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Specifications</button>
       <button class="calib-tab-btn" data-tab="2pt" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">2-Point Calibration</button>
       <button class="calib-tab-btn" data-tab="multi" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Multi-Point Calibration</button>
+      <button class="calib-tab-btn" data-tab="verify" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Verify Calibration</button>
+      <button class="calib-tab-btn" data-tab="data" style="padding: 8px 18px; border-radius: 6px 6px 0 0; border: none; background: #e0e0e0; color: #333; font-weight: bold;">Data</button>
     </div>
     <!-- Tab Contents -->
     <div id="calib-tab-content-specs" class="calib-tab-content">
@@ -469,56 +409,128 @@
       </div>
       <div id="calibration-result" style="margin-top: 8px; font-size: 15px;"></div>
     </div>
-  </div>
-</div>
-   
-<!-- Log Data -->
-<div style="margin-top:20px; margin-bottom: 10px; font-size: 24px; font-weight: bold;">Log Data</div>
-<div style="display: flex; width: 100%;">
-    <div id="table-container" style="width: 100%; font-size: 12px;">
-        <table id="data-table">
-            <tbody>
-                <!-- Data rows will be dynamically added here -->
-            </tbody>
-        </table>
-    </div>
-</div>
-<!-- Save Data button row (moved below the table) -->
-<div id="save-data-row" style="display: flex; flex-direction: row; justify-content: flex-start; width: 100%; margin-bottom: 6px; margin-top: 6px;">
-    <button onclick="saveData()" style="color:white; width: 160px; height: 28px;">Save Data</button>
-</div>
-
-<div id="footer" style="background-color: #B2E4FF; text-align: center; padding: 5px; margin-top: 10px;">
-Loadstar Sensors Copyright 2025 All Rights Reserved.
-</div>
-
-<div id="calibration-modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
-  <div id="calibration-modal-content" style="background:#fff; padding:24px 18px 18px 18px; border-radius:8px; min-width:420px; max-width:90vw; max-height:90vh; overflow:auto; position:relative;">
-    <button onclick="closeCalibrationModal()" style="position:absolute; top:8px; right:12px; font-size:20px; background:none; color:#333; border:none; cursor:pointer;">&times;</button>
-    <div id="calibration-modal-body">
-      <h2 style="margin-bottom: 10px;">Calibration Utility</h2>
-      <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
-        <thead>
-          <tr>
-            <th style="width: 60px; padding: 4px 2px; text-align: center;">Point No.</th>
-            <th style="width: 120px; padding: 4px 2px; text-align: center;">Known Weight</th>
-            <th style="width: 120px; padding: 4px 2px; text-align: center;">Raw Sensor Value</th>
-            <th style="width: 70px; padding: 4px 2px; text-align: center;">Action</th>
-            <th style="width: 40px; padding: 4px 2px; text-align: center;"></th>
-          </tr>
-        </thead>
-        <tbody id="calibration-table-body">
-          <!-- Dynamic rows will be rendered here -->
-        </tbody>
-      </table>
-      <div style="margin-top: 10px; display: flex; gap: 10px;">
-        <button onclick="calculateCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Calculate Calibration</button>
-        <button onclick="burnCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Burn Calibration</button>
+    <!-- Verify Calibration Tab Content (hidden by default) -->
+    <div id="calib-tab-content-verify" class="calib-tab-content" style="display:none;">
+      <div id="middle" style="margin-top:10px;">
+        <div id="reading-content">
+          <div id="outputReading" class="outputBox"></div>   
+        </div>
+        <!-- New row for controls and Peak/Low -->
+        <div id="reading-controls-row" style="display: flex; flex-direction: row; align-items: center; gap: 32px; margin-top: 8px; margin-bottom: 8px; width: 100%;">
+          <div class="horizontal-align">
+            <label class="value-label">Resolution:</label>
+            <select id="resolutionSelect" onchange="return updateResolution()">
+              <option value="0">x</option>
+              <option value="1">x.x</option>
+              <option value="2" selected>x.xx</option>
+            </select>
+          </div>
+          <div class="horizontal-align">
+            <label class="value-label">Units:</label>
+            <select id="unitSelect" onchange="updateUnits()">
+              <option value="lb">lb</option>
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="N">N</option>
+            </select>
+          </div>
+          <div class="horizontal-align">
+            <label class="value-label">Average:</label>
+            <select id="averageReading" onchange="averageReading()">
+              <option value="1">1</option>
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <!-- Peak/Low moved here -->
+          <div class="horizontal-align" style="margin-left: 32px;">
+            <div class="value-label" style="font-size: 14px;">Peak:</div>
+            <div id="peak-value" style="background-color: #000000; color: #0000FF; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
+          </div>
+          <div class="horizontal-align">
+            <div class="value-label" style="font-size: 14px;">Low:</div>
+            <div id="low-value" style="background-color: #000000; color: #FF0000; font-size: 16px; width: 80px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 6px;">N/A</div>
+          </div>
+        </div>
       </div>
-      <div id="calibration-result" style="margin-top: 8px; font-size: 15px;"></div>
+      <div class="button-container" style="margin-top:5px;">
+        <button id="tare"  onclick="tare()" style="color:white; width:49%; height: 25px;display: none;">Tare</button>
+        <button id="read" onclick="showReading()" style="color:white; width: 49%; height: 25px; display: none;">Read</button>
+        <button id="stop" onclick="stopReading()" style="color:white; width: 49%; height: 25px; display: none;">Stop</button>
+      </div>
+      <div style="margin-top:10px; margin-bottom: 10px; font-size: 14; font-weight: bold;">
+        Force vs Time Plot:&nbsp;<span id="graphtype" style="text-transform: capitalize;"></span></div>
+      <div style="width: 100vw; max-width: 100vw; margin-left: calc(-50vw + 50%);">
+        <div id="graph-container" style="width: 100vw; max-width: 100vw; height: 40vh;">
+          <canvas id="dataChart" style="width: 100vw; max-width: 100vw; height: 40vh;"></canvas>
+        </div>
+        <div id="chart-controls-row" style="display: flex; flex-direction: row; gap: 10px; margin-top: 10px; width: 100vw; max-width: 100vw;">
+          <button onclick="showCumulativeGraph()" style="color:white; width: 160px; height: 28px;">Cumulative</button>
+          <button onclick="showRecentGraph()" style="color:white; width: 160px; height: 28px;">Strip Chart</button>
+        </div>
+      </div>
+    </div>
+    <!-- Data Tab Content (hidden by default) -->
+    <div id="calib-tab-content-data" class="calib-tab-content" style="display:none;">
+      <div style="margin-top:20px; margin-bottom: 10px; font-size: 24px; font-weight: bold;">Log Data</div>
+      <div style="display: flex; width: 100%;">
+        <div id="table-container" style="width: 100%; font-size: 12px;">
+          <table id="data-table">
+            <tbody>
+              <!-- Data rows will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="save-data-row" style="display: flex; flex-direction: row; justify-content: flex-start; width: 100%; margin-bottom: 6px; margin-top: 6px;">
+        <button onclick="saveData()" style="color:white; width: 160px; height: 28px;">Save Data</button>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Tab switching logic for Calibration Utility (now with Verify Calibration) -->
+<script>
+(function() {
+  function showTab(tab) {
+    document.querySelectorAll('.calib-tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById('calib-tab-content-' + tab).style.display = 'block';
+    document.querySelectorAll('.calib-tab-btn').forEach(btn => btn.style.background = '#e0e0e0');
+    document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').style.background = '#fff';
+    // If switching to verify, (re)initialize chart if needed
+    if(tab === 'verify') {
+      if(window.chart && window.chart.data) {
+        window.chart.update();
+      } else if(typeof initializeChart === 'function') {
+        initializeChart();
+      }
+      if(typeof createTableHead === 'function') {
+        createTableHead();
+        const tableBody = document.querySelector('#data-table tbody');
+        const table = tableBody.parentElement;
+        table.insertBefore(createTableHead(), tableBody);
+      }
+      document.getElementById("graphtype").textContent = window.chartMode === 'cumulative'? 'Cumulative': 'Strip Chart';
+    }
+    // If switching to data, ensure table head is present
+    if(tab === 'data') {
+      if(typeof createTableHead === 'function') {
+        createTableHead();
+        const tableBody = document.querySelector('#data-table tbody');
+        const table = tableBody.parentElement;
+        table.insertBefore(createTableHead(), tableBody);
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.calib-tab-btn').forEach(btn => {
+      btn.onclick = function() { showTab(btn.getAttribute('data-tab')); };
+    });
+    showTab('specs'); // Default tab
+  });
+})();
+</script>
 
 <script>
     console.log = function() {}
@@ -906,18 +918,17 @@ function stopReading() {
         isStart = true;
         let sum =0, avg=0,isPush=false, counter=0;
         readingInterval = setInterval(async () => {
-            const rawValue = await fetchRawSensorValue();
-            let slope = window._calibSlope;
-            let intercept = window._calibIntercept;
+            const { weight, deviceUnit } = await fetchDeviceWeightAndUnit();
             let displayValue, convertedData;
-            if (typeof slope === 'number' && typeof intercept === 'number' && !isNaN(slope) && !isNaN(intercept) && slope !== 0) {
-                const weight = (parseFloat(rawValue) - intercept) / slope;
-                convertedData = weight;
-                displayValue = `${weight.toFixed(currentResolution)} ${_currentUnit}`;
-            } else {
-                convertedData = parseFloat(rawValue);
-                displayValue = `${rawValue} (raw)`;
+            let fromUnit = deviceUnit;
+            let toUnit = _currentUnit;
+            let value = weight;
+            // Convert if needed
+            if (fromUnit !== toUnit && conversionFactors[fromUnit] && conversionFactors[fromUnit][toUnit]) {
+                value = weight * conversionFactors[fromUnit][toUnit];
             }
+            convertedData = value;
+            displayValue = `${value.toFixed(currentResolution)} ${toUnit}`;
             if(counter<avgCount) {
                 isPush = false;
                 sum+=parseFloat(convertedData);
@@ -1102,6 +1113,32 @@ function clearTable() {
     }
 }
 
+async function fetchDeviceWeightAndUnit() {
+    // Send 'W' to get the current weight
+    await writer.write('W\r');
+    let weightResult = '';
+    const decoder = new TextDecoder();
+    while (true) {
+        const { value, done } = await globalReader.read();
+        if (done) break;
+        weightResult += decoder.decode(value);
+        if (weightResult.includes('\n')) break;
+    }
+    const weight = parseFloat(weightResult.trim());
+
+    // Send 'UNITS' to get the current unit
+    await writer.write('UNITS\r');
+    let unitResult = '';
+    while (true) {
+        const { value, done } = await globalReader.read();
+        if (done) break;
+        unitResult += decoder.decode(value);
+        if (unitResult.includes('\n')) break;
+    }
+    const deviceUnit = unitResult.trim();
+    return { weight, deviceUnit };
+}
+
 </script>
 
 <script>
@@ -1196,19 +1233,25 @@ function clearTable() {
     }
   }
     function createTableHead() {
-    const tableHead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-    const headers = ["Time", "Reading"+` (${_currentUnit})`, "Peak"+` (${_currentUnit})`, "Low"+` (${_currentUnit})`];
-    headers.forEach(headerText => {
-      const headerCell = document.createElement("th");
-      headerCell.textContent = headerText; // Set the header text
-      headerCell.style.fontWeight = "normal"; // Set normal font weight
-      headerRow.appendChild(headerCell);
-    });
-
-    tableHead.appendChild(headerRow);
-    return tableHead;
+  const table = document.querySelector('#data-table');
+  // Remove any existing thead
+  const oldHead = table.querySelector('thead');
+  if (oldHead) {
+    table.removeChild(oldHead);
   }
+  const tableHead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  const headers = ["Time", "Reading"+` (${_currentUnit})`, "Peak"+` (${_currentUnit})`, "Low"+` (${_currentUnit})`];
+  headers.forEach(headerText => {
+    const headerCell = document.createElement("th");
+    headerCell.textContent = headerText; // Set the header text
+    headerCell.style.fontWeight = "normal"; // Set normal font weight
+    headerRow.appendChild(headerCell);
+  });
+  tableHead.appendChild(headerRow);
+  table.insertBefore(tableHead, table.querySelector('tbody'));
+  return tableHead;
+}
 </script>
 
 <script>
@@ -1833,6 +1876,30 @@ readCalibrationRaw = async function(idx, direction) {
     document.getElementById('calib-tab-content-' + tab).style.display = 'block';
     document.querySelectorAll('.calib-tab-btn').forEach(btn => btn.style.background = '#e0e0e0');
     document.querySelector('.calib-tab-btn[data-tab="' + tab + '"]').style.background = '#fff';
+    // If switching to verify, (re)initialize chart if needed
+    if(tab === 'verify') {
+      if(window.chart && window.chart.data) {
+        window.chart.update();
+      } else if(typeof initializeChart === 'function') {
+        initializeChart();
+      }
+      if(typeof createTableHead === 'function') {
+        createTableHead();
+        const tableBody = document.querySelector('#data-table tbody');
+        const table = tableBody.parentElement;
+        table.insertBefore(createTableHead(), tableBody);
+      }
+      document.getElementById("graphtype").textContent = window.chartMode === 'cumulative'? 'Cumulative': 'Strip Chart';
+    }
+    // If switching to data, ensure table head is present
+    if(tab === 'data') {
+      if(typeof createTableHead === 'function') {
+        createTableHead();
+        const tableBody = document.querySelector('#data-table tbody');
+        const table = tableBody.parentElement;
+        table.insertBefore(createTableHead(), tableBody);
+      }
+    }
   }
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.calib-tab-btn').forEach(btn => {
@@ -1963,4 +2030,3 @@ window.burn2ptCalibration = async function() {
 </script>
 </body>
 </html>
-
