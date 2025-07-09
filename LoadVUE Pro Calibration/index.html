@@ -274,6 +274,31 @@
 #calib-live-section > div {
   /* Only style the plot and value area, not the table */
 }
+    .specs-row {
+        display: grid;
+        grid-template-columns: 110px 120px 80px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+    .specs-label {
+        min-width: 110px;
+    }
+    .specs-input {
+        width: 120px !important;
+        min-width: 120px;
+        max-width: 120px;
+        box-sizing: border-box;
+        height: 28px;
+        padding: 2px 6px;
+    }
+    .specs-row select.specs-input {
+        height: 28px;
+        padding: 2px 6px;
+    }
+    .specs-burn-btn {
+        width: 80px;
+    }
 </style>
 </head>
 <body>
@@ -299,37 +324,40 @@
     <!-- Tab Contents -->
     <div id="calib-tab-content-specs" class="calib-tab-content">
       <!-- Specifications Tab Content -->
-      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 480px; margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label for="sensorID" style="min-width: 110px;">ID:</label>
-          <input type="text" class="entrybox" id="sensorID" style="border: 1.5px solid #888; background: #fff;">
-          <button onclick="burnID()" class="burn-btn">Burn</button>
+      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 280px; margin-bottom: 10px;">
+        <div class="specs-row">
+          <label for="sensorID" class="specs-label">ID:</label>
+          <input type="text" class="entrybox specs-input" id="sensorID" style="border: 1.5px solid #888; background: #fff;">
+          <button onclick="burnID()" class="burn-btn specs-burn-btn">Burn</button>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label for="sensorCapacity" style="min-width: 110px;">Capacity:</label>
-          <input type="text" class="entrybox" id="sensorCapacity" style="border: 1.5px solid #888; background: #fff;">
-          <button onclick="burnCapacity()" class="burn-btn">Burn</button>
+        <div class="specs-row">
+          <label for="sensorCapacity" class="specs-label">Capacity:</label>
+          <input type="text" class="entrybox specs-input" id="sensorCapacity" style="border: 1.5px solid #888; background: #fff;">
+          <button onclick="burnCapacity()" class="burn-btn specs-burn-btn">Burn</button>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label for="sensorUnits" style="min-width: 110px;">Units:</label>
-          <select id="sensorUnits" onchange="burnUnits()" style="border: 1.5px solid #888; background: #fff;">
+        <div class="specs-row">
+          <label for="sensorUnits" class="specs-label">Units:</label>
+          <select id="sensorUnits" class="specs-input" onchange="burnUnits()" style="border: 1.5px solid #888; background: #fff;">
             <option value="lb">lb</option>
             <option value="kg">kg</option>
             <option value="g">g</option>
             <option value="N">N</option>
           </select>
-          <button onclick="burnUnits()" class="burn-btn">Burn</button>
+          <button onclick="burnUnits()" class="burn-btn specs-burn-btn">Burn</button>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-          <label for="ncal-mode" style="min-width: 110px;">Calibration Mode (NCAL):</label>
-          <select id="ncal-mode" onchange="setNCALMode()" style="border: 1.5px solid #888; background: #fff;">
+          <label for="ncal-mode" style="min-width: 110px;">Calibration Mode:</label>
+          <select id="ncal-mode" onchange="setNCALMode()" style="border: 1.5px solid #888; background: #fff; flex: 1;">
             <option value="1">Single Direction (Compression Only)</option>
             <option value="2">Both Directions (Compression + Tension)</option>
           </select>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
           <label for="baud" style="min-width: 110px;">Baud Rate:</label>
-          <input type="number" class="entrybox" id="baud" value="9600" min="1" style="border: 1.5px solid #888; background: #fff;">
+          <select id="baud" style="border: 1.5px solid #888; background: #fff; flex: 1;">
+            <option value="9600" selected>9600</option>
+            <option value="203400">203400 (High Speed)</option>
+          </select>
         </div>
       </div>
       <div id="specs-summary" style="margin-top: 10px; font-size: 15px; color: #333;"></div>
@@ -341,30 +369,46 @@
         1. Enter two different known loads (e.g., 0 and 100)<br>
         2. Click "Capture" for each load to capture the raw sensor values<br>
         3. Click "Calculate Calibration" to see the linear fit<br>
-        4. Click "Burn 2-Point Calibration" to save to sensor
+        4. Click "Burn Calibration" to save to sensor<br>
+        5. Click "Verify Calibration" to verify the calibration
       </div>
-      <table style="width: 100%; max-width: 400px; margin-bottom: 10px;">
-        <tr>
-          <th>Load (Known)</th>
-          <th>Raw Value</th>
-          <th>Action</th>
-        </tr>
-        <tr>
-          <td><input type="number" id="twopt-load1" style="width: 80px;"></td>
-          <td id="twopt-raw1">---</td>
-          <td><button onclick="read2ptRaw(1)" class="burn-btn">Capture</button></td>
-        </tr>
-        <tr>
-          <td><input type="number" id="twopt-load2" style="width: 80px;"></td>
-          <td id="twopt-raw2">---</td>
-          <td><button onclick="read2ptRaw(2)" class="burn-btn">Capture</button></td>
-        </tr>
+      <table id="twopt-calibration-table" style="width: 100%; max-width: 400px; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed; margin-bottom: 10px;">
+        <thead>
+          <tr>
+            <th style="width: 30px; text-align: center;">#</th>
+            <th style="width: 100px; text-align: center;">Known Load</th>
+            <th style="width: 100px; text-align: center;">Raw Value</th>
+            <th style="width: 70px; text-align: center;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center;">1</td>
+            <td style="text-align: center;">
+              <input type="number" id="twopt-load1" style="width: 80px; height: 22px; font-size: 14px; text-align: center;" placeholder="Enter">
+            </td>
+            <td id="twopt-raw1" style="text-align: center;">---</td>
+            <td style="display: flex; align-items: center; justify-content: center;">
+              <button onclick="read2ptRaw(1)" class="burn-btn" style="width: 60px; height: 22px; font-size: 13px;">Capture</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center;">2</td>
+            <td style="text-align: center;">
+              <input type="number" id="twopt-load2" style="width: 80px; height: 22px; font-size: 14px; text-align: center;" placeholder="Enter">
+            </td>
+            <td id="twopt-raw2" style="text-align: center;">---</td>
+            <td style="display: flex; align-items: center; justify-content: center;">
+              <button onclick="read2ptRaw(2)" class="burn-btn" style="width: 60px; height: 22px; font-size: 13px;">Capture</button>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <button onclick="calculate2ptCalibration()" class="burn-btn" style="width: 180px;">Calculate Calibration</button>
-      <button onclick="burn2ptCalibration()" class="burn-btn" style="width: 180px;">Burn 2-Point Calibration</button>
+      <button onclick="burn2ptCalibration()" class="burn-btn" style="width: 180px;">Burn Calibration</button>
       <div id="calibration-result-2pt" style="margin-top: 8px; font-size: 15px;"></div>
     </div>
-    <div id="calib-tab-content-multi" class="calib-tab-content" style="display:none;">
+    <div id="calib-tab-content-multi" class="calib-tab-content" style="display:none; padding-bottom: 60px;">
       <!-- Multi-Point Calibration Tab Content (with both directions) -->
       <div id="calib-live-section" style="width: 100%; max-width: 100vw; margin-bottom: 18px; display: flex; flex-direction: column; align-items: center;">
         <div style="display: flex; flex-direction: row; width: 100%; gap: 0;">
@@ -385,25 +429,25 @@
       <table id="calibration-table" style="width: 100%; border-collapse: collapse; background-color: #fff; margin-left: 0; table-layout: fixed;">
         <thead>
           <tr>
-            <th colspan="4" style="text-align: center; background: #e0e0e0;">Compression</th>
-            <th colspan="4" style="text-align: center; background: #f0f0f0;">Tension</th>
+            <th colspan="4" style="text-align: center; background: #007BC6; color: #fff;">Compression</th>
+            <th colspan="4" style="text-align: center; background: #007BC6; color: #fff;">Tension</th>
           </tr>
           <tr>
             <th style="width: 30px; text-align: center;">#</th>
             <th style="width: 100px; text-align: center;">Known Load</th>
             <th style="width: 100px; text-align: center;">Raw</th>
-            <th style="width: 70px; text-align: center;">Capture</th>
+            <th style="width: 70px; text-align: center;"></th>
             <th style="width: 30px; text-align: center;">#</th>
             <th style="width: 100px; text-align: center;">Known Load</th>
             <th style="width: 100px; text-align: center;">Raw</th>
-            <th style="width: 70px; text-align: center;">Capture</th>
+            <th style="width: 70px; text-align: center;"></th>
           </tr>
         </thead>
         <tbody id="calibration-table-body">
           <!-- Dynamic rows will be rendered here -->
         </tbody>
       </table>
-      <div style="margin-top: 10px; display: flex; gap: 10px;">
+      <div style="margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
         <button onclick="calculateCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Calculate Calibration</button>
         <button onclick="burnCalibration()" style="color:white; width: 160px; height: 28px; font-size: 15px;">Burn Calibration</button>
       </div>
@@ -454,10 +498,10 @@
           </div>
         </div>
       </div>
-      <div class="button-container" style="margin-top:5px;">
-        <button id="tare"  onclick="tare()" style="color:white; width:49%; height: 25px;display: none;">Tare</button>
-        <button id="read" onclick="showReading()" style="color:white; width: 49%; height: 25px; display: none;">Read</button>
-        <button id="stop" onclick="stopReading()" style="color:white; width: 49%; height: 25px; display: none;">Stop</button>
+      <div class="button-container" style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 5px; gap: 16px;">
+        <button id="tare" onclick="tare()" style="color:white; min-width: 160px; height: 32px; display: none;">Tare</button>
+        <button id="read" onclick="showReading()" style="color:white; min-width: 160px; height: 32px; display: none;">Read</button>
+        <button id="stop" onclick="stopReading()" style="color:white; min-width: 160px; height: 32px; display: none;">Stop</button>
       </div>
       <div style="margin-top:10px; margin-bottom: 10px; font-size: 14; font-weight: bold;">
         Force vs Time Plot:&nbsp;<span id="graphtype" style="text-transform: capitalize;"></span></div>
@@ -465,9 +509,9 @@
         <div id="graph-container" style="width: 100vw; max-width: 100vw; height: 40vh;">
           <canvas id="dataChart" style="width: 100vw; max-width: 100vw; height: 40vh;"></canvas>
         </div>
-        <div id="chart-controls-row" style="display: flex; flex-direction: row; gap: 10px; margin-top: 10px; width: 100vw; max-width: 100vw;">
-          <button onclick="showCumulativeGraph()" style="color:white; width: 160px; height: 28px;">Cumulative</button>
-          <button onclick="showRecentGraph()" style="color:white; width: 160px; height: 28px;">Strip Chart</button>
+        <div id="chart-controls-row" style="width: 100%; display: flex; flex-direction: row; gap: 16px; justify-content: center; align-items: center; margin-top: 10px;">
+          <button onclick="showCumulativeGraph()" style="color:white; min-width: 160px; height: 32px;">Cumulative</button>
+          <button onclick="showRecentGraph()" style="color:white; min-width: 160px; height: 32px;">Strip Chart</button>
         </div>
       </div>
     </div>
@@ -483,7 +527,7 @@
           </table>
         </div>
       </div>
-      <div id="save-data-row" style="display: flex; flex-direction: row; justify-content: flex-start; width: 100%; margin-bottom: 6px; margin-top: 6px;">
+      <div id="save-data-row" style="display: flex; flex-direction: row; justify-content: center; width: 100%; margin-bottom: 6px; margin-top: 6px;">
         <button onclick="saveData()" style="color:white; width: 160px; height: 28px;">Save Data</button>
       </div>
     </div>
@@ -1203,7 +1247,7 @@ async function fetchDeviceWeightAndUnit() {
         chartMode = 'cumulative';
         chart.data.labels = chartLabels;
         chart.data.datasets[0].data = chartData;
-        chart.update();
+        chart.update({animation: false}); // Disable animation
     }
 
     // Function to show only the most recent 5 values
@@ -1213,7 +1257,7 @@ async function fetchDeviceWeightAndUnit() {
         var recentData = chartData.slice(-10);  // Get the last 5 data points
         chart.data.labels = recentLabels;
         chart.data.datasets[0].data = recentData;
-        chart.update();
+        chart.update({animation: false}); // Disable animation
     }
 
     // Call initializeChart() on document ready
