@@ -16,6 +16,7 @@ A comprehensive web-based calibration utility for LoadVUE Pro sensors, providing
 #### 1. 2-Point Calibration
 - Simple linear calibration using two known load points
 - Automatic slope and intercept calculation
+- R² goodness-of-fit calculation for calibration quality assessment
 - Direct sensor programming capability
 
 #### 2. Multi-Point Calibration
@@ -23,6 +24,7 @@ A comprehensive web-based calibration utility for LoadVUE Pro sensors, providing
 - Support for up to 9 calibration points per direction
 - Separate compression and tension calibration points
 - Real-time raw value plotting during calibration
+- R² goodness-of-fit calculation for both linear and cubic fits
 
 #### 3. Sensor Configuration
 - **Sensor ID Management**: Set and burn unique sensor identifiers
@@ -84,7 +86,7 @@ Navigate to the **Specifications** tab to configure basic sensor parameters:
 1. Navigate to **2-Point Calibration** tab
 2. Enter two different known loads (e.g., 0 and 100)
 3. Click "Capture" for each load to record raw sensor values
-4. Click "Calculate Calibration" to view linear fit parameters
+4. Click "Calculate Calibration" to view linear fit parameters and R² value
 5. Click "Burn 2-Point Calibration" to save to sensor
 
 #### 3. Multi-Point Calibration
@@ -93,7 +95,7 @@ Navigate to the **Specifications** tab to configure basic sensor parameters:
 3. Enter known loads for each calibration point
 4. Click "Capture" to record raw values for each point
 5. Use real-time plotting to monitor sensor stability
-6. Click "Calculate Calibration" to view cubic fit parameters
+6. Click "Calculate Calibration" to view cubic fit parameters and R² values
 7. Click "Burn Calibration" to save to sensor
 
 ### Real-time Monitoring
@@ -154,11 +156,13 @@ Navigate to the **Data** tab to view and manage logged data:
 ```
 raw = slope × weight + intercept
 ```
+The application calculates R² (coefficient of determination) to assess the quality of the linear fit. R² values closer to 1.0 indicate better fit quality.
 
 #### Cubic Fit (Multi-Point)
 ```
 raw = a×weight³ + b×weight² + c×weight + d
 ```
+For multi-point calibration, the application provides R² values for both linear and cubic fits, allowing users to compare fit quality and choose the most appropriate model.
 
 ### Communication Protocol
 
@@ -206,7 +210,8 @@ The application communicates with LoadVUE Pro sensors using the following comman
 #### Calibration Issues
 1. **Invalid Readings**: Ensure sensor is stable before capturing
 2. **Poor Fit**: Use more calibration points for better accuracy
-3. **Burn Failures**: Check sensor communication and try again
+3. **Low R² Values**: Check sensor stability and consider using more calibration points
+4. **Burn Failures**: Check sensor communication and try again
 
 #### Data Issues
 1. **Missing Data**: Verify sensor connection is stable

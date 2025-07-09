@@ -1472,24 +1472,41 @@ function calculateCalibration() {
     document.getElementById('calibration-result').textContent = 'At least 2 points are required for calibration.';
     return;
   }
-  // Linear regression (raw = slope * weight + intercept)
-  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, n = points.length;
+  
+  // Calculate R² for linear fit
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, sumYY = 0, n = points.length;
   for (const pt of points) {
     sumX += pt.weight;
     sumY += pt.raw;
     sumXY += pt.weight * pt.raw;
     sumXX += pt.weight * pt.weight;
+    sumYY += pt.raw * pt.raw;
   }
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;
+  
+  // Calculate R² for linear fit
+  const meanY = sumY / n;
+  let ssRes = 0, ssTot = 0;
+  for (const pt of points) {
+    const predicted = slope * pt.weight + intercept;
+    ssRes += Math.pow(pt.raw - predicted, 2);
+    ssTot += Math.pow(pt.raw - meanY, 2);
+  }
+  const rSquaredLinear = 1 - (ssRes / ssTot);
+  
   let resultText = `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}<br>`;
+  resultText += `R² = ${rSquaredLinear.toFixed(4)}<br>`;
+  
   // Store for burning
   window._calibSlope = slope;
   window._calibIntercept = intercept;
+  
   // If at least 4 points, also show cubic fit
   if (points.length >= 4) {
     const x = points.map(pt => pt.weight);
     const y = points.map(pt => pt.raw);
+    
     function cubicFit(x, y) {
       const n = x.length;
       let sumX = 0, sumX2 = 0, sumX3 = 0, sumX4 = 0, sumX5 = 0, sumX6 = 0;
@@ -1540,9 +1557,21 @@ function calculateCalibration() {
       }
       return gauss(A, B); // [a, b, c, d]
     }
+    
     const [CCA, CCB, CCC, CCD] = cubicFit(x, y);
-    resultText += `<br>Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})`;
+    
+    // Calculate R² for cubic fit
+    let ssResCubic = 0;
+    for (const pt of points) {
+      const predicted = CCA * Math.pow(pt.weight, 3) + CCB * Math.pow(pt.weight, 2) + CCC * pt.weight + CCD;
+      ssResCubic += Math.pow(pt.raw - predicted, 2);
+    }
+    const rSquaredCubic = 1 - (ssResCubic / ssTot);
+    
+    resultText += `<br>Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})<br>`;
+    resultText += `R² = ${rSquaredCubic.toFixed(4)}<br>`;
   }
+  
   // Show which points were used
   if (ncalMode === 1) {
     resultText += '<br><em>Used only compression points.</em>';
@@ -1959,12 +1988,24 @@ window.calculate2ptCalibration = function() {
   const slope = (r2 - r1) / (w2 - w1);
   const intercept = r1 - slope * w1;
   
+  // Calculate R² for 2-point linear fit
+  const points = [{weight: w1, raw: r1}, {weight: w2, raw: r2}];
+  const meanY = (r1 + r2) / 2;
+  let ssRes = 0, ssTot = 0;
+  for (const pt of points) {
+    const predicted = slope * pt.weight + intercept;
+    ssRes += Math.pow(pt.raw - predicted, 2);
+    ssTot += Math.pow(pt.raw - meanY, 2);
+  }
+  const rSquared = 1 - (ssRes / ssTot);
+  
   // Store for use in main display and burning
   window._calibSlope = slope;
   window._calibIntercept = intercept;
   
   document.getElementById('calibration-result-2pt').innerHTML = 
     `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}<br>` +
+    `R² = ${rSquared.toFixed(4)}<br>` +
     `Calibration ready to burn.`;
 };
 window.burn2ptCalibration = async function() {
