@@ -1589,7 +1589,7 @@ async function readCalibrationRaw(idx, direction) {
     return;
   }
   rawCell.textContent = 'Averaging...';
-  const avgRawValue = await getMovingAverageRawValue(100, 10);
+  const avgRawValue = await getMovingAverageRawValue(50, 20);
   if (isNaN(avgRawValue)) {
     rawCell.textContent = 'Error';
     alert('Failed to get a valid average raw value.');
@@ -1823,7 +1823,7 @@ function delay(ms) {
 }
 
 // Helper function to get moving average of N raw sensor values
-async function getMovingAverageRawValue(numReadings = 100, delayMs = 10) {
+async function getMovingAverageRawValue(numReadings = 50, delayMs = 20) {
   const readings = [];
   for (let i = 0; i < numReadings; i++) {
     const rawValue = await fetchRawSensorValue();
@@ -2094,7 +2094,7 @@ window.read2ptRaw = async function(idx) {
   }
   
   rawCell.textContent = 'Averaging...';
-  const avgRawValue = await getMovingAverageRawValue(100, 10);
+  const avgRawValue = await getMovingAverageRawValue(50, 20);
   if (isNaN(avgRawValue)) {
     rawCell.textContent = 'Error';
     alert('Failed to get a valid average raw value.');
