@@ -494,6 +494,16 @@
         font-size: 2.2rem;
       }
     }
+    #projection-table th, #projection-table td {
+      padding: 6px 4px;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 480px) {
+      #projection-table th, #projection-table td {
+        padding: 4px 2px;
+        font-size: 0.7rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -678,11 +688,11 @@
         <table id="projection-table">
           <thead>
             <tr>
-              <th>Year</th>
-              <th>Savings</th>
+              <th>Yr</th>
+              <th>Save</th>
               <th>Cost</th>
               <th>Net</th>
-              <th>ROI (%)</th>
+              <th>ROI</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -914,6 +924,14 @@
       }).format(value);
     }
 
+    function formatKCurrency(value) {
+      const abs = Math.abs(value);
+      if (abs >= 1000) {
+        return (value < 0 ? '-' : '') + '$' + Math.round(abs / 1000) + 'k';
+      }
+      return (value < 0 ? '-' : '') + '$' + Math.round(abs);
+    }
+
     function updateCostBreakdown(
       smallScalesCost, medScalesCost, largeScalesCost, routersCost, totalHardwareCost,
       totalSoftwareCost, otherCost
@@ -946,9 +964,9 @@
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${year}</td>
-          <td>$${formatCurrency(totalSavings)}</td>
-          <td>$${formatCurrency(cost)}</td>
-          <td>$${formatCurrency(net)}</td>
+          <td>${formatKCurrency(totalSavings)}</td>
+          <td>${formatKCurrency(cost)}</td>
+          <td>${formatKCurrency(net)}</td>
           <td class="roi-value ${roi >= 0 ? 'positive' : 'negative'}">${roi.toFixed(2)}%</td>
         `;
         tbody.appendChild(row);
