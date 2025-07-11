@@ -129,6 +129,7 @@
         color: #000000;
         font-size: 16px;
         margin-bottom: 5px;
+        background: none !important;
     }
     #peak-value {
         background-color: #000000;
@@ -270,10 +271,7 @@
     background-color: #005b8a;
     box-shadow: 0 4px 12px rgba(0,0,0,0.13);
 }
-/* Remove previous calibration-section/table overrides, keep original white style */
-#calib-live-section > div {
-  /* Only style the plot and value area, not the table */
-}
+
     .specs-row {
         display: grid;
         grid-template-columns: 110px 120px 80px;
@@ -395,44 +393,52 @@
     </div>
     <!-- Tab Contents -->
     <div id="calib-tab-content-specs" class="calib-tab-content">
-      <!-- Specifications Tab Content -->
-      <div style="display: flex; flex-direction: column; gap: 16px; max-width: 280px; margin-bottom: 10px;">
-        <div class="specs-row">
-          <label for="sensorID" class="specs-label">ID:</label>
-          <input type="text" class="entrybox specs-input" id="sensorID" style="border: 1.5px solid #888; background: #fff;">
-          <button onclick="burnID()" class="burn-btn specs-burn-btn">Burn</button>
+      <div style="display: flex; flex-direction: row; align-items: flex-start; gap: 40px;">
+        <!-- Left: Form -->
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 280px; margin-bottom: 10px;">
+          <div class="specs-row">
+            <label for="sensorID" class="specs-label">ID:</label>
+            <input type="text" class="entrybox specs-input" id="sensorID" style="border: 1.5px solid #888; background: #fff;">
+            <button onclick="burnID()" class="burn-btn specs-burn-btn">Burn</button>
+          </div>
+          <div class="specs-row">
+            <label for="sensorCapacity" class="specs-label">Capacity:</label>
+            <input type="text" class="entrybox specs-input" id="sensorCapacity" style="border: 1.5px solid #888; background: #fff;">
+            <button onclick="burnCapacity()" class="burn-btn specs-burn-btn">Burn</button>
+          </div>
+          <div class="specs-row">
+            <label for="sensorUnits" class="specs-label">Units:</label>
+            <select id="sensorUnits" class="specs-input" onchange="burnUnits()" style="border: 1.5px solid #888; background: #fff;">
+              <option value="lb">lb</option>
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="N">N</option>
+            </select>
+            <button onclick="burnUnits()" class="burn-btn specs-burn-btn">Burn</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label for="ncal-mode" style="min-width: 110px;">Calibration Mode:</label>
+            <select id="ncal-mode" onchange="setNCALMode()" style="border: 1.5px solid #888; background: #fff; flex: 1;">
+              <option value="1">Compression Only</option>
+              <option value="2">Compression/Tension</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label for="baud" style="min-width: 110px;">Baud Rate:</label>
+            <select id="baud" style="border: 1.5px solid #888; background: #fff; flex: 1;">
+              <option value="9600" selected>9600</option>
+              <option value="203400">203400 (High Speed)</option>
+            </select>
+          </div>
+          <div id="specs-summary" style="margin-top: 10px; font-size: 15px; color: #333;"></div>
         </div>
-        <div class="specs-row">
-          <label for="sensorCapacity" class="specs-label">Capacity:</label>
-          <input type="text" class="entrybox specs-input" id="sensorCapacity" style="border: 1.5px solid #888; background: #fff;">
-          <button onclick="burnCapacity()" class="burn-btn specs-burn-btn">Burn</button>
-        </div>
-        <div class="specs-row">
-          <label for="sensorUnits" class="specs-label">Units:</label>
-          <select id="sensorUnits" class="specs-input" onchange="burnUnits()" style="border: 1.5px solid #888; background: #fff;">
-            <option value="lb">lb</option>
-            <option value="kg">kg</option>
-            <option value="g">g</option>
-            <option value="N">N</option>
-          </select>
-          <button onclick="burnUnits()" class="burn-btn specs-burn-btn">Burn</button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label for="ncal-mode" style="min-width: 110px;">Calibration Mode:</label>
-          <select id="ncal-mode" onchange="setNCALMode()" style="border: 1.5px solid #888; background: #fff; flex: 1;">
-            <option value="1">Compression Only</option>
-            <option value="2">Compression/Tension</option>
-          </select>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <label for="baud" style="min-width: 110px;">Baud Rate:</label>
-          <select id="baud" style="border: 1.5px solid #888; background: #fff; flex: 1;">
-            <option value="9600" selected>9600</option>
-            <option value="203400">203400 (High Speed)</option>
-          </select>
+        <!-- Right: Live Sensor Settings -->
+        <div id="sensor-settings-container" style="margin-top: 0; margin-left: 500px; min-width: 320px; max-width: 420px; flex: 1;">
+          <h3 style="margin-bottom: 6px;">Live Sensor Settings</h3>
+          <pre id="sensor-settings-display" style="background:#ffffff;color:#000000;padding:8px;height:260px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;border:1px solid #444;"></pre>
+          <button id="refresh-settings-btn" style="margin-top: 6px; padding: 6px 18px; font-size: 15px; background: #007BC6; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Refresh Settings</button>
         </div>
       </div>
-      <div id="specs-summary" style="margin-top: 10px; font-size: 15px; color: #333;"></div>
     </div>
     <!-- mV/V Calibration Tab Content -->
     <div id="calib-tab-content-mvv" class="calib-tab-content" style="display:none;">
@@ -589,6 +595,14 @@
               <div class="value-label" style="min-width: 70px; font-size: 15px; color: #222; margin-right: 8px; text-align: left; background: none !important;">Low:</div>
               <div id="low-value" style="background-color: #000000; color: #FF0000; font-size: 16px; width: 90px; height: 32px; display: flex; align-items: center; justify-content: center; margin-left: 0; margin-top: 0; border-radius: 4px; border: 1px solid #bbb;">N/A</div>
             </div>
+          </div>
+          <div id="coefficients-column" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:200px;max-width:220px;padding:24px 18px 24px 18px;background:#ffffff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);border:1px solid #ffffff;order:-1;">
+            <div class="value-label" style="font-weight:bold; font-size: 16px; margin-bottom: 4px;">Coefficients</div>
+            <div id="coeff-CCA" class="value-label">CCA: N/A</div>
+            <div id="coeff-CCB" class="value-label">CCB: N/A</div>
+            <div id="coeff-CCC" class="value-label">CCC: N/A</div>
+            <div id="coeff-CCD" class="value-label">CCD: N/A</div>
+            <div id="coeff-FAZ" class="value-label">FAZ: N/A</div>
           </div>
         </div>
       </div>
@@ -816,10 +830,11 @@
         
         if (!settings) {
             statusDiv.innerHTML = '<div style="color: #d9534f; font-weight: bold;">Calibration Status: No calibration detected</div>';
+            updateCoefficientsDisplay(null);
             return;
         }
         
-        let statusHTML = '<div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #007BC6;">';
+        let statusHTML = '<div style="margin-bottom: 10px; padding: 10px; border-radius: 6px; border-left: 4px solid #007BC6;">';
         statusHTML += '<div style="font-weight: bold; color: #007BC6; margin-bottom: 8px;">Current Calibration Settings:</div>';
         
         // Determine calibration type
@@ -844,6 +859,21 @@
         
         statusHTML += '</div>';
         statusDiv.innerHTML = statusHTML;
+        updateCoefficientsDisplay(settings);
+    }
+
+    // Function to update the side coefficient window
+    function updateCoefficientsDisplay(settings) {
+        const mapping = { CCA: 'coeff-CCA', CCB: 'coeff-CCB', CCC: 'coeff-CCC', CCD: 'coeff-CCD', FAZ: 'coeff-FAZ' };
+        Object.entries(mapping).forEach(([key, id]) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let val = 'N/A';
+            if (settings && settings[key] !== null && settings[key] !== undefined) {
+                val = key === 'FAZ' ? parseFloat(settings[key]).toFixed(2) : parseFloat(settings[key]).toExponential(6);
+            }
+            el.textContent = key + ': ' + val;
+        });
     }
 
     // Function to start monitoring calibration settings
@@ -921,6 +951,8 @@
                 
                 // Stop monitoring calibration settings
                 stopCalibrationMonitoring();
+                // Stop live settings monitoring
+                stopSettingsMonitoring();
                 
                 if (writer) {
                     await writer.close();
@@ -1760,7 +1792,7 @@ function calculateCalibration() {
   const rSquaredLinear = 1 - (ssRes / ssTot);
   
   let resultText = `Linear fit: raw = ${slope.toFixed(6)} * weight + ${intercept.toFixed(2)}<br>`;
-  resultText += `R² = ${rSquaredLinear.toFixed(4)}<br>`;
+  resultText += `R² = ${rSquaredLinear.toFixed(6)}<br>`;   // six decimals
   
   // Store for burning
   window._calibSlope = slope;
@@ -1833,7 +1865,7 @@ function calculateCalibration() {
     const rSquaredCubic = 1 - (ssResCubic / ssTot);
     
     resultText += `<br>Cubic fit: raw = (${CCA.toExponential(6)})*weight^3 + (${CCB.toExponential(6)})*weight^2 + (${CCC.toExponential(6)})*weight + (${CCD.toExponential(6)})<br>`;
-    resultText += `R² = ${rSquaredCubic.toFixed(4)}<br>`;
+    resultText += `R² = ${rSquaredCubic.toFixed(6)}<br>`;
   }
   
   // Show which points were used
@@ -2408,6 +2440,68 @@ document.addEventListener('DOMContentLoaded', function() {
       startCalibrationMonitoring();
     };
   }
+});
+</script>
+
+<script>
+// ===== Live Settings Monitoring for Specs tab =====
+let settingsMonitorInterval = null;
+
+async function fetchAndDisplaySensorSettings() {
+    if (!writer || !globalReader) return;
+    try {
+        await writer.write('settings\r');
+        await delay(150);
+        let result = '';
+        const decoder = new TextDecoder();
+        const start = Date.now();
+        while (Date.now() - start < 250) {
+            const { value, done } = await globalReader.read();
+            if (done) break;
+            result += decoder.decode(value);
+            if (result.includes('>')) break; // prompt reached
+        }
+        const display = document.getElementById('sensor-settings-display');
+        if (display) display.textContent = result.trim();
+    } catch (err) {
+        console.error('Error fetching sensor settings:', err);
+    }
+}
+
+function startSettingsMonitoring() {
+    // Fetch the settings just once instead of polling continuously
+    fetchAndDisplaySensorSettings();
+}
+
+function stopSettingsMonitoring() {
+    if (settingsMonitorInterval) {
+        clearInterval(settingsMonitorInterval);
+        settingsMonitorInterval = null;
+    }
+}
+
+// Hook into tab switches
+document.addEventListener('DOMContentLoaded', function () {
+    const allBtns = document.querySelectorAll('.calib-tab-btn');
+    allBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.getAttribute('data-tab') === 'specs') {
+                startSettingsMonitoring();
+            } else {
+                stopSettingsMonitoring();
+            }
+        });
+    });
+    // If Specs is the default active tab, start immediately
+    const defaultSpecsBtn = document.querySelector('.calib-tab-btn[data-tab="specs"]');
+    if (defaultSpecsBtn && defaultSpecsBtn.classList.contains('active-tab')) {
+        startSettingsMonitoring();
+    }
+    // Attach click handler for manual refresh of sensor settings
+    const refreshSettingsBtn = document.getElementById('refresh-settings-btn');
+    if (refreshSettingsBtn) {
+        refreshSettingsBtn.addEventListener('click', fetchAndDisplaySensorSettings);
+    }
 });
 </script>
 </body>
