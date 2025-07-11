@@ -434,7 +434,7 @@
         </div>
         <!-- Right: Live Sensor Settings -->
         <div id="sensor-settings-container" style="margin-top: 0; margin-left: 500px; min-width: 320px; max-width: 420px; flex: 1;">
-          <h3 style="margin-bottom: 6px;">Live Sensor Settings</h3>
+          <h3 style="margin-bottom: 6px;">Current Sensor Settings</h3>
           <pre id="sensor-settings-display" style="background:#ffffff;color:#000000;padding:8px;height:260px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;border:1px solid #444;"></pre>
           <button id="refresh-settings-btn" style="margin-top: 6px; padding: 6px 18px; font-size: 15px; background: #007BC6; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Refresh Settings</button>
         </div>
@@ -552,9 +552,9 @@
     <div id="calib-tab-content-verify" class="calib-tab-content" style="display:none;">
       <!-- Calibration Status Display -->
       <div style="margin-bottom: 10px;">
-        <button id="refresh-calib-status-btn" style="padding: 6px 18px; font-size: 15px; background: #007BC6; color: #fff; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 10px;">Refresh Calibration Status</button>
+        <button id="refresh-calib-status-btn" style="padding: 6px 18px; font-size: 15px; background: #007BC6; color: #fff; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 0px; margin-top: 20px;">Refresh Calibration Results</button>
       </div>
-      <div id="calibration-status" style="margin-bottom: 20px;"></div>
+      <div id="calibration-status" style="margin-bottom: 6px;"></div>
       
       <div id="middle" style="margin-top:10px;">
         <div id="reading-content" style="display: flex; flex-direction: row; align-items: flex-start; gap: 32px;">
@@ -567,6 +567,7 @@
                 <option value="0">x</option>
                 <option value="1">x.x</option>
                 <option value="2" selected>x.xx</option>
+                <option value="3" selected>x.xxx</option>
               </select>
             </div>
             <div class="horizontal-align" style="width: 100%; display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0;">
@@ -597,12 +598,17 @@
             </div>
           </div>
           <div id="coefficients-column" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:200px;max-width:220px;padding:24px 18px 24px 18px;background:#ffffff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);border:1px solid #ffffff;order:-1;">
-            <div class="value-label" style="font-weight:bold; font-size: 16px; margin-bottom: 4px;">Coefficients</div>
+            <div class="value-label" style="font-weight:bold; font-size: 16px; margin-bottom: 4px;">Calibration Results</div>
+            <div id="coeff-Type" class="value-label">Type: N/A</div>
+            <div id="coeff-NCAL" class="value-label">Mode: N/A</div>
+            <div id="coeff-mvv" class="value-label">mV/V: N/A</div>
             <div id="coeff-CCA" class="value-label">CCA: N/A</div>
             <div id="coeff-CCB" class="value-label">CCB: N/A</div>
             <div id="coeff-CCC" class="value-label">CCC: N/A</div>
             <div id="coeff-CCD" class="value-label">CCD: N/A</div>
             <div id="coeff-FAZ" class="value-label">FAZ: N/A</div>
+            <!-- Additional calibration meta info -->
+            
           </div>
         </div>
       </div>
@@ -864,15 +870,57 @@
 
     // Function to update the side coefficient window
     function updateCoefficientsDisplay(settings) {
-        const mapping = { CCA: 'coeff-CCA', CCB: 'coeff-CCB', CCC: 'coeff-CCC', CCD: 'coeff-CCD', FAZ: 'coeff-FAZ' };
+        // Map of setting keys (or derived keys) to element IDs
+        const mapping = {
+            _TYPE: 'coeff-Type',      // derived (calibration type)
+            _NCAL: 'coeff-NCAL',      // derived (NCAL mode string)
+            mvv: 'coeff-mvv',          // direct
+            CCA: 'coeff-CCA',
+            CCB: 'coeff-CCB',
+            CCC: 'coeff-CCC',
+            CCD: 'coeff-CCD',
+            FAZ: 'coeff-FAZ',
+            
+        };
+
+        // Helper: derive human-readable calibration type & NCAL strings
+        const getDerived = (key) => {
+            if (!settings) return 'N/A';
+            if (key === '_TYPE') {
+                if (settings.CCA !== null && settings.CCA !== 0) return 'Cubic (Multi-Point)';
+                if (settings.CCC !== null && settings.CCC !== 0) return 'Linear (2-Point)';
+                if (settings.mvv !== null) return 'mV/V Only';
+                return 'Unknown';
+            }
+            if (key === '_NCAL') {
+                return settings.ncalMode === 1 ? 'Compression Only' : settings.ncalMode === 2 ? 'Compression/Tension' : 'Unknown';
+            }
+            return 'N/A';
+        };
+
         Object.entries(mapping).forEach(([key, id]) => {
             const el = document.getElementById(id);
             if (!el) return;
             let val = 'N/A';
-            if (settings && settings[key] !== null && settings[key] !== undefined) {
-                val = key === 'FAZ' ? parseFloat(settings[key]).toFixed(2) : parseFloat(settings[key]).toExponential(6);
+
+            if (key.startsWith('_')) {
+                val = getDerived(key);
+            } else if (settings && settings[key] !== null && settings[key] !== undefined) {
+                if (key === 'FAZ') {
+                    val = parseFloat(settings[key]).toFixed(2);
+                } else if (key === 'mvv') {
+                    val = parseFloat(settings[key]).toFixed(4);
+                } else {
+                    val = parseFloat(settings[key]).toExponential(6);
+                }
             }
-            el.textContent = key + ': ' + val;
+
+            // Custom label names for derived keys
+            let label = key;
+            if (key === '_TYPE') label = 'Type';
+            else if (key === '_NCAL') label = 'Mode';
+
+            el.textContent = label + ': ' + val;
         });
     }
 
@@ -880,7 +928,7 @@
     function startCalibrationMonitoring() {
         fetchCalibrationSettings().then(settings => {
             currentCalibrationSettings = settings || {};
-            updateCalibrationStatus(settings);
+            updateCoefficientsDisplay(settings);
         });
     }
 
